@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from jose import JWTError, jwt
+import jwt
 from app.core.config import get_settings
 from app.domain.repositories.user_repository import UserRepository
 from app.domain.services.user_service import UserService
