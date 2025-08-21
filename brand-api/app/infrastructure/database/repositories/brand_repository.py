@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.entities.brand import Brand
 from app.domain.repositories.brand_repository import BrandRepository
 from app.infrastructure.database.models.brand import BrandModel
+from app.shared.enums.brand_status import BrandStatus
 
 
 class BrandRepositoryImpl(BrandRepository):
@@ -14,7 +15,7 @@ class BrandRepositoryImpl(BrandRepository):
 
     async def create(self, brand: Brand) -> Brand:
         db_brand = BrandModel(
-            marca=brand.marca, titular=brand.titular, estado=brand.estado
+            marca=brand.marca, titular=brand.titular, status=brand.status.value
         )
         self._db_session.add(db_brand)
         await self._db_session.commit()
@@ -43,7 +44,7 @@ class BrandRepositoryImpl(BrandRepository):
 
         db_brand.marca = brand.marca
         db_brand.titular = brand.titular
-        db_brand.estado = brand.estado
+        db_brand.status = brand.status.value
 
         await self._db_session.commit()
         await self._db_session.refresh(db_brand)
@@ -66,7 +67,7 @@ class BrandRepositoryImpl(BrandRepository):
             id=db_brand.id,
             marca=db_brand.marca,
             titular=db_brand.titular,
-            estado=db_brand.estado,
+            status=BrandStatus(db_brand.status),
             created_at=db_brand.created_at,
             updated_at=db_brand.updated_at,
         )

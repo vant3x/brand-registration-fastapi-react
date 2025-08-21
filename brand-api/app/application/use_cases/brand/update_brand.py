@@ -20,7 +20,7 @@ class UpdateBrandUseCase:
             existing_brand.marca = brand_dto.marca
         if brand_dto.titular is not None:
             existing_brand.titular = brand_dto.titular
-        if brand_dto.estado is not None:
-            existing_brand.estado = brand_dto.estado
+        if brand_dto.status is not None:
+            existing_brand.status = brand_dto.status
 
         return await self.brand_repository.update(existing_brand)

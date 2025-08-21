@@ -25,12 +25,12 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("marca", sa.String(), nullable=False),
         sa.Column("titular", sa.String(), nullable=False),
-        sa.Column("estado", sa.String(), nullable=False),
+        sa.Column("status", sa.String(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f("ix_brands_estado"), "brands", ["estado"], unique=False)
+    op.create_index(op.f("ix_brands_status"), "brands", ["status"], unique=False)
     op.create_index(op.f("ix_brands_id"), "brands", ["id"], unique=False)
     op.create_index(op.f("ix_brands_marca"), "brands", ["marca"], unique=True)
     op.create_index(op.f("ix_brands_titular"), "brands", ["titular"], unique=False)
@@ -43,6 +43,6 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_brands_titular"), table_name="brands")
     op.drop_index(op.f("ix_brands_marca"), table_name="brands")
     op.drop_index(op.f("ix_brands_id"), table_name="brands")
-    op.drop_index(op.f("ix_brands_estado"), table_name="brands")
+    op.drop_index(op.f("ix_brands_status"), table_name="brands")
     op.drop_table("brands")
     # ### end Alembic commands ###

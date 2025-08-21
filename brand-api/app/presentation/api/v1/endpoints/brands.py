@@ -19,14 +19,14 @@ async def create_brand(
 ):
     use_case = CreateBrandUseCase(brand_repo)
     dto = CreateBrandDTO(
-        marca=brand_data.marca, titular=brand_data.titular, estado=brand_data.estado
+        marca=brand_data.marca, titular=brand_data.titular, status=brand_data.status
     )
     brand = await use_case.execute(dto)
     return BrandResponse(
         id=brand.id,
         marca=brand.marca,
         titular=brand.titular,
-        estado=brand.estado,
+        status=brand.status,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
     )
@@ -40,7 +40,7 @@ async def get_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
         id=brand.id,
         marca=brand.marca,
         titular=brand.titular,
-        estado=brand.estado,
+        status=brand.status,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
     )
@@ -50,16 +50,14 @@ async def get_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
 async def get_all_brands(
     skip: int = 0, limit: int = 100, brand_repo=Depends(get_brand_repository)
 ):
-    # This use case is not explicitly defined, but the repository has get_all
-    # For simplicity, we'll call the repository directly here.
-    # In a more complex scenario, a GetAllBrandsUseCase would be appropriate.
+    
     brands = await brand_repo.get_all(skip=skip, limit=limit)
     return [
         BrandResponse(
             id=brand.id,
             marca=brand.marca,
             titular=brand.titular,
-            estado=brand.estado,
+            status=brand.status,
             created_at=brand.created_at,
             updated_at=brand.updated_at,
         )
@@ -73,14 +71,14 @@ async def update_brand(
 ):
     use_case = UpdateBrandUseCase(brand_repo)
     dto = UpdateBrandDTO(
-        marca=brand_data.marca, titular=brand_data.titular, estado=brand_data.estado
+        marca=brand_data.marca, titular=brand_data.titular, status=brand_data.status
     )
     brand = await use_case.execute(brand_id, dto)
     return BrandResponse(
         id=brand.id,
         marca=brand.marca,
         titular=brand.titular,
-        estado=brand.estado,
+        status=brand.status,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
     )

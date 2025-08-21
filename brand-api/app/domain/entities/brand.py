@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
+
+from app.shared.enums.brand_status import BrandStatus
 
 
 @dataclass
@@ -8,7 +12,7 @@ class Brand:
     # Fields without default values
     marca: str
     titular: str
-    estado: str
+    status: BrandStatus
 
     # Fields with default values
     id: Optional[int] = None
