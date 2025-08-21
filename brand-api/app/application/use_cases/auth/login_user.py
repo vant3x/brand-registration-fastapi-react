@@ -29,7 +29,7 @@ class LoginUseCase:
 
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
         return self._create_access_token(
-            data={"sub": user.email}, expires_delta=access_token_expires
+            data={"sub": user.email.value}, expires_delta=access_token_expires
         )
 
     def _create_access_token(
