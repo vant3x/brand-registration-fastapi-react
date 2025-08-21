@@ -1,8 +1,7 @@
-from pydantic import BaseModel, EmailStr
-
-
 from dataclasses import dataclass
 from typing import Optional
+
+from pydantic import EmailStr
 
 
 @dataclass(frozen=True)

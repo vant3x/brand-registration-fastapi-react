@@ -1,1 +1,1 @@
-# Brand Domain Service
+# Brand Domain Service (empty for now)

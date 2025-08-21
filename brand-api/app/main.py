@@ -1,17 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import get_settings
-from app.presentation.api.v1.router import api_router
-from app.core.exceptions import setup_exception_handlers
 
+from app.core.config import get_settings
+from app.core.exceptions import setup_exception_handlers
+from app.presentation.api.v1.router import api_router
 
 settings = get_settings()
 
-app = FastAPI(
-    title=settings.project_name,
-    version="1.0.0",
-    debug=settings.debug
-)
+app = FastAPI(title=settings.project_name, version="1.0.0", debug=settings.debug)
 
 
 # app.add_middleware(
