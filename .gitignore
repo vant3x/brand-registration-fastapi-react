@@ -1,2 +1,39 @@
 /brand_frontend/node_modules
 brand_frontend/node_modules
+
+# Python
+brand_api/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+brand_api/.Python
+brand_api/env/
+brand_api/venv/
+brand_api/.env
+brand_api/.venv
+brand_api/pip-log.txt
+brand_api/pip-delete-this-directory.txt
+
+# FastAPI
+brand_api/.pytest_cache/
+brand_api/htmlcov/
+brand_api/.coverage
+brand_api/.coverage.*
+
+# IDEs
+brand_api/.vscode/
+brand_api/.idea/
+brand_api/*.swp
+brand_api/*.swo
+
+# OS
+brand_api/.DS_Store
+brand_api/Thumbs.db
+
+# Logs
+*.log
+brand_api/logs/
+
+# Database
+brand_api/*.db
+brand_api/*.sqlite3
