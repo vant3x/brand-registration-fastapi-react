@@ -1,0 +1,37 @@
+import boto3
+from botocore.exceptions import ClientError
+
+from app.core.config import get_settings
+
+settings = get_settings()
+
+
+class S3Service:
+    def __init__(self):
+        self.s3_client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.aws_access_key_id,
+            aws_secret_access_key=settings.aws_secret_access_key,
+            region_name=settings.aws_region_name,
+        )
+        self.bucket_name = settings.aws_s3_bucket_name
+
+    def upload_file(
+        self, file_content: bytes, object_name: str, content_type: str
+    ) -> str:
+        try:
+            self.s3_client.put_object(
+                Bucket=self.bucket_name,
+                Key=object_name,
+                Body=file_content,
+                ContentType=content_type,
+            )
+            file_url = (
+                f"https://{self.bucket_name}.s3."
+                f"{settings.aws_region_name}.amazonaws.com/{object_name}"
+            )
+            return file_url
+        except ClientError as e:
+            # Log the error for debugging
+            print(f"Error uploading file to S3: {e}")
+            raise

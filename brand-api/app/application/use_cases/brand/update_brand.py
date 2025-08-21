@@ -15,12 +15,13 @@ class UpdateBrandUseCase:
         if not existing_brand:
             raise BrandNotFoundError()
 
-        # Update fields if provided in DTO
         if brand_dto.marca is not None:
             existing_brand.marca = brand_dto.marca
         if brand_dto.titular is not None:
             existing_brand.titular = brand_dto.titular
         if brand_dto.status is not None:
             existing_brand.status = brand_dto.status
+        if brand_dto.pais_registro is not None:
+            existing_brand.pais_registro = brand_dto.pais_registro
 
         return await self.brand_repository.update(existing_brand)

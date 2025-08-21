@@ -11,6 +11,8 @@ class BrandBase(BaseModel):
     marca: str = Field(..., min_length=2, max_length=100)
     titular: str = Field(..., min_length=2, max_length=100)
     status: BrandStatus
+    pais_registro: Optional[str] = 'Colombia'
+    imagen_url: Optional[str] = None
 
 
 # Schema for creating a new brand
@@ -28,6 +30,8 @@ class BrandUpdate(BaseModel):
 # Schema for the response when a brand is returned
 class BrandResponse(BrandBase):
     id: int
+    pais_registro: Optional[str] = None
+    imagen_url: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 

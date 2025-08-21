@@ -13,6 +13,8 @@ class CreateBrandUseCase:
             marca=brand_dto.marca,
             titular=brand_dto.titular,
             status=brand_dto.status,
+            pais_registro=brand_dto.pais_registro,
+            imagen_url=brand_dto.imagen_url,
             created_at=None,  
             updated_at=None, 
         )

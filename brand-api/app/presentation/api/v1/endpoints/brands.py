@@ -19,7 +19,11 @@ async def create_brand(
 ):
     use_case = CreateBrandUseCase(brand_repo)
     dto = CreateBrandDTO(
-        marca=brand_data.marca, titular=brand_data.titular, status=brand_data.status
+        marca=brand_data.marca,
+        titular=brand_data.titular,
+        status=brand_data.status,
+        pais_registro=brand_data.pais_registro,
+        imagen_url=brand_data.imagen_url,
     )
     brand = await use_case.execute(dto)
     return BrandResponse(
@@ -27,6 +31,8 @@ async def create_brand(
         marca=brand.marca,
         titular=brand.titular,
         status=brand.status,
+        pais_registro=brand.pais_registro,
+        imagen_url=brand.imagen_url,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
     )
@@ -41,6 +47,7 @@ async def get_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
         marca=brand.marca,
         titular=brand.titular,
         status=brand.status,
+        pais_registro=brand.pais_registro,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
     )
@@ -58,6 +65,7 @@ async def get_all_brands(
             marca=brand.marca,
             titular=brand.titular,
             status=brand.status,
+            pais_registro=brand.pais_registro,
             created_at=brand.created_at,
             updated_at=brand.updated_at,
         )
@@ -71,13 +79,14 @@ async def update_brand(
 ):
     use_case = UpdateBrandUseCase(brand_repo)
     dto = UpdateBrandDTO(
-        marca=brand_data.marca, titular=brand_data.titular, status=brand_data.status
+        marca=brand_data.marca, titular=brand_data.titular, pais_registro=brand_data.pais_registro, status=brand_data.status
     )
     brand = await use_case.execute(brand_id, dto)
     return BrandResponse(
         id=brand.id,
         marca=brand.marca,
         titular=brand.titular,
+        pais_registro=brand.pais_registro,
         status=brand.status,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
@@ -88,4 +97,4 @@ async def update_brand(
 async def delete_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
     use_case = DeleteBrandUseCase(brand_repo)
     await use_case.execute(brand_id)
-    return  # No content for 204
+    return  

@@ -15,8 +15,13 @@ class BrandRepositoryImpl(BrandRepository):
 
     async def create(self, brand: Brand) -> Brand:
         db_brand = BrandModel(
-            marca=brand.marca, titular=brand.titular, status=brand.status.value
+            marca=brand.marca,
+            titular=brand.titular,
+            status=brand.status.value,
+            pais_registro=brand.pais_registro,
+            imagen_url=brand.imagen_url,
         )
+        print(f"DEBUG: pais_registro before add: {db_brand.pais_registro}")
         self._db_session.add(db_brand)
         await self._db_session.commit()
         await self._db_session.refresh(db_brand)
@@ -45,6 +50,8 @@ class BrandRepositoryImpl(BrandRepository):
         db_brand.marca = brand.marca
         db_brand.titular = brand.titular
         db_brand.status = brand.status.value
+        db_brand.pais_registro = brand.pais_registro
+        db_brand.imagen_url = brand.imagen_url
 
         await self._db_session.commit()
         await self._db_session.refresh(db_brand)
@@ -68,6 +75,8 @@ class BrandRepositoryImpl(BrandRepository):
             marca=db_brand.marca,
             titular=db_brand.titular,
             status=BrandStatus(db_brand.status),
+            pais_registro=db_brand.pais_registro,
+            imagen_url=db_brand.imagen_url,
             created_at=db_brand.created_at,
             updated_at=db_brand.updated_at,
         )

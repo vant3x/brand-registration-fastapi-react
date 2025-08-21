@@ -16,5 +16,7 @@ class Brand:
 
     # Fields with default values
     id: Optional[int] = None
+    pais_registro: Optional[str] = 'Colombia'
+    imagen_url: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
