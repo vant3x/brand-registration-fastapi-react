@@ -12,7 +12,7 @@ app = FastAPI(
 
 @app.get("/")
 async def root():
-    return {"message": "FastAPI CRUD - Professional Architecture"}
+    return {"message": "FastAPI CRUD - Marcas"}
 
 
 @app.get("/health")
