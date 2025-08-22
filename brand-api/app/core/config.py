@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -20,6 +21,12 @@ class Settings(BaseSettings):
 
     # Cache
     redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
+
+    # AWS S3
+    aws_access_key_id: Optional[str] = Field(None, env="AWS_ACCESS_KEY_ID")
+    aws_secret_access_key: Optional[str] = Field(None, env="AWS_SECRET_ACCESS_KEY")
+    aws_region_name: Optional[str] = Field(None, env="AWS_REGION_NAME")
+    aws_s3_bucket_name: Optional[str] = Field(None, env="AWS_S3_BUCKET_NAME")
 
     class Config:
         env_file = ".env"

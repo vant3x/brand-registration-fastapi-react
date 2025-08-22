@@ -11,6 +11,8 @@ class CreateBrandDTO:
     status: BrandStatus
     pais_registro: Optional[str] = 'Colombia'
     imagen_url: Optional[str] = None
+    imagen_file_content: Optional[bytes] = None
+    imagen_file_name: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -19,4 +21,6 @@ class UpdateBrandDTO:
     titular: Optional[str] = None
     status: Optional[BrandStatus] = None
     pais_registro: Optional[str] = 'Colombia'
+    imagen_file_content: Optional[bytes] = None
+    imagen_file_name: Optional[str] = None
 

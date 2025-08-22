@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from fastapi import UploadFile
 
 from pydantic import BaseModel, Field
 
@@ -17,7 +18,7 @@ class BrandBase(BaseModel):
 
 # Schema for creating a new brand
 class BrandCreate(BrandBase):
-    pass
+    imagen_file: Optional[UploadFile] = None
 
 
 # Schema for updating a brand
@@ -25,6 +26,7 @@ class BrandUpdate(BaseModel):
     marca: Optional[str] = Field(None, min_length=2, max_length=100)
     titular: Optional[str] = Field(None, min_length=2, max_length=100)
     status: Optional[BrandStatus]
+    imagen_file: Optional[UploadFile] = None
 
 
 # Schema for the response when a brand is returned

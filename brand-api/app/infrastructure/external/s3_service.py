@@ -6,19 +6,37 @@ from app.core.config import get_settings
 settings = get_settings()
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class S3Service:
     def __init__(self):
-        self.s3_client = boto3.client(
-            "s3",
-            aws_access_key_id=settings.aws_access_key_id,
-            aws_secret_access_key=settings.aws_secret_access_key,
-            region_name=settings.aws_region_name,
-        )
-        self.bucket_name = settings.aws_s3_bucket_name
+        if (
+            settings.aws_access_key_id
+            and settings.aws_secret_access_key
+            and settings.aws_region_name
+            and settings.aws_s3_bucket_name
+        ):
+            self.s3_client = boto3.client(
+                "s3",
+                aws_access_key_id=settings.aws_access_key_id,
+                aws_secret_access_key=settings.aws_secret_access_key,
+                region_name=settings.aws_region_name,
+            )
+            self.bucket_name = settings.aws_s3_bucket_name
+            logger.info("S3Service initialized successfully.")
+        else:
+            self.s3_client = None
+            self.bucket_name = None
+            logger.warning("S3Service not initialized: Missing AWS credentials or bucket name in settings.")
 
     def upload_file(
         self, file_content: bytes, object_name: str, content_type: str
     ) -> str:
+        if self.s3_client is None:
+            logger.error("S3Service is not configured. Cannot upload file.")
+            raise RuntimeError("S3 service is not configured.")
         try:
             self.s3_client.put_object(
                 Bucket=self.bucket_name,
@@ -33,5 +51,5 @@ class S3Service:
             return file_url
         except ClientError as e:
             # Log the error for debugging
-            print(f"Error uploading file to S3: {e}")
+            logger.error(f"Error uploading file to S3: {e}")
             raise
