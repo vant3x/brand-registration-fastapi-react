@@ -1,12 +1,14 @@
 from typing import List, Optional
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError # Added this import
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.entities.brand import Brand
 from app.domain.repositories.brand_repository import BrandRepository
 from app.infrastructure.database.models.brand import BrandModel
 from app.shared.enums.brand_status import BrandStatus
+from app.core.exceptions import BrandAlreadyExistsError # Added this import
 
 
 class BrandRepositoryImpl(BrandRepository):
@@ -24,9 +26,18 @@ class BrandRepositoryImpl(BrandRepository):
         print(f"DEBUG: Creating brand with imagen_url: {brand.imagen_url}")
         print(f"DEBUG: pais_registro before add: {db_brand.pais_registro}")
         self._db_session.add(db_brand)
-        await self._db_session.commit()
-        await self._db_session.refresh(db_brand)
-        return self._to_entity(db_brand)
+        try:
+            await self._db_session.commit()
+            await self._db_session.refresh(db_brand)
+            return self._to_entity(db_brand)
+        except IntegrityError as e:
+            await self._db_session.rollback()
+        
+            if e.orig and hasattr(e.orig, 'pgcode') and e.orig.pgcode == '23505':
+            
+                if "marca" in str(e.orig):
+                    raise BrandAlreadyExistsError(brand.marca)
+            raise 
 
     async def get_by_id(self, brand_id: int) -> Optional[Brand]:
         result = await self._db_session.execute(

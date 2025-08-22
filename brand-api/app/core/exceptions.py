@@ -6,6 +6,12 @@ class CoreException(Exception):
 
 
 # Excepciones Específicas
+class BrandAlreadyExistsError(CoreException):
+    """Raised when a brand with the same name already exists in the database."""
+
+    def __init__(self, marca: str):
+        self.marca = marca
+        super().__init__(f"La marca '{marca}' ya está registrada.")
 class EmailAlreadyExistsError(CoreException):
     """Raised when an email already exists in the database."""
 
@@ -78,4 +84,13 @@ def setup_exception_handlers(app: FastAPI):
         return JSONResponse(
             status_code=HTTP_404_NOT_FOUND,
             content={"detail": "Marca no encontrada."},
+        )
+
+    @app.exception_handler(BrandAlreadyExistsError)
+    async def brand_already_exists_exception_handler(
+        request: Request, exc: BrandAlreadyExistsError
+    ):
+        return JSONResponse(
+            status_code=HTTP_409_CONFLICT,
+            content={"detail": str(exc)},
         )

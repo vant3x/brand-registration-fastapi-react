@@ -5,9 +5,18 @@ from app.core.config import get_settings
 from app.core.exceptions import setup_exception_handlers
 from app.presentation.api.v1.router import api_router
 
-settings = get_settings()
+from app.core.limiter import limiter
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
+
+settings = get_settings()
 app = FastAPI(title=settings.project_name, version="1.0.0", debug=settings.debug)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 
 # app.add_middleware(
@@ -18,11 +27,9 @@ app = FastAPI(title=settings.project_name, version="1.0.0", debug=settings.debug
 #    allow_headers=["*"],
 # )
 
-# Exception handlers
 setup_exception_handlers(app)
 
 
-# Routes
 app.include_router(api_router, prefix=settings.api_v1_prefix)
 
 

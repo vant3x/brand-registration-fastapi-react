@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     project_name: str = "FastAPI CRUD brands"
     debug: bool = False
+    rate_limit: str = Field(default="10/minute", env="RATE_LIMIT")
 
     # Cache
     redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
