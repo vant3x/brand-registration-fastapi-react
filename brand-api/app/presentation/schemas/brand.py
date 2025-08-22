@@ -18,7 +18,7 @@ class BrandBase(BaseModel):
 
 # Schema for creating a new brand
 class BrandCreate(BrandBase):
-    imagen_file: Optional[UploadFile] = None
+    pass
 
 
 # Schema for updating a brand

@@ -36,4 +36,5 @@ brand_api/logs/
 
 # Database
 brand_api/*.db
-brand_api/*.sqlite3
+brand_api/*.sqlite3.env
+brand-api/.env
