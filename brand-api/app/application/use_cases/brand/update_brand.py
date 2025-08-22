@@ -6,6 +6,7 @@ from app.domain.entities.brand import Brand
 from app.domain.repositories.brand_repository import BrandRepository
 from app.infrastructure.external.s3_service import S3Service
 import uuid
+import mimetypes
 
 
 class UpdateBrandUseCase:
@@ -22,13 +23,21 @@ class UpdateBrandUseCase:
         if brand_dto.imagen_file_content and brand_dto.imagen_file_name:
             file_extension = brand_dto.imagen_file_name.split('.')[-1]
             object_name = f"brands/{uuid.uuid4()}.{file_extension}"
-            
-            new_image_url = self.s3_service.upload_file(
-                file_content=brand_dto.imagen_file_content,
-                object_name=object_name,
-                content_type="image/jpeg" 
-            )
-            existing_brand.imagen_url = new_image_url
+
+            guessed_mime_type, _ = mimetypes.guess_type(brand_dto.imagen_file_name)
+            content_type = guessed_mime_type if guessed_mime_type else "image/jpeg" # Default to jpeg if cannot guess
+
+            try:
+                new_image_url = self.s3_service.upload_file(
+                    file_content=brand_dto.imagen_file_content,
+                    object_name=object_name,
+                    content_type=content_type
+                )
+                existing_brand.imagen_url = new_image_url
+            except Exception as e:
+                print(f"Error uploading image to S3: {e}")
+                # Decide how to handle the error: re-raise, log, return original URL, etc.
+                # For now, we'll proceed without updating the image_url if upload fails
         elif brand_dto.imagen_url is not None:
             existing_brand.imagen_url = brand_dto.imagen_url
 

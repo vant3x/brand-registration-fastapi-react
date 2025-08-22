@@ -66,6 +66,7 @@ async def get_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
         titular=brand.titular,
         status=brand.status,
         pais_registro=brand.pais_registro,
+        imagen_url=brand.imagen_url,
         created_at=brand.created_at,
         updated_at=brand.updated_at,
     )
@@ -84,6 +85,7 @@ async def get_all_brands(
             titular=brand.titular,
             status=brand.status,
             pais_registro=brand.pais_registro,
+            imagen_url=brand.imagen_url,
             created_at=brand.created_at,
             updated_at=brand.updated_at,
         )

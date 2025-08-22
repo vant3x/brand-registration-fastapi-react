@@ -21,6 +21,7 @@ class BrandRepositoryImpl(BrandRepository):
             pais_registro=brand.pais_registro,
             imagen_url=brand.imagen_url,
         )
+        print(f"DEBUG: Creating brand with imagen_url: {brand.imagen_url}")
         print(f"DEBUG: pais_registro before add: {db_brand.pais_registro}")
         self._db_session.add(db_brand)
         await self._db_session.commit()
