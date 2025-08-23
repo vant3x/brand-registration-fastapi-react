@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(..., env="SECRET_KEY")
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
 
     # API
     api_v1_prefix: str = "/api/v1"

@@ -1,15 +1,10 @@
-from datetime import datetime, timedelta
-from typing import Optional
-
-import jwt
+from typing import Dict
 
 from app.application.dto.user_dto import LoginDTO
-from app.core.config import get_settings
 from app.core.exceptions import InvalidCredentialsException, UserNotFoundError
 from app.domain.repositories.user_repository import UserRepository
+from app.domain.services import jwt_service
 from app.domain.services.user_service import UserService
-
-settings = get_settings()
 
 
 class LoginUseCase:
@@ -17,7 +12,7 @@ class LoginUseCase:
         self.user_repository = user_repository
         self.user_service = UserService()
 
-    async def execute(self, login_dto: LoginDTO) -> str:
+    async def execute(self, login_dto: LoginDTO) -> Dict[str, str]:
         user = await self.user_repository.get_by_email(login_dto.email)
         if not user:
             raise UserNotFoundError()
@@ -27,21 +22,10 @@ class LoginUseCase:
         ):
             raise InvalidCredentialsException()
 
-        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-        return self._create_access_token(
-            data={"sub": user.email.value}, expires_delta=access_token_expires
-        )
+        access_token = jwt_service.create_access_token(subject=user.email.value)
+        refresh_token = jwt_service.create_refresh_token(subject=user.email.value)
 
-    def _create_access_token(
-        self, data: dict, expires_delta: Optional[timedelta] = None
-    ) -> str:
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=15)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(
-            to_encode, settings.secret_key, algorithm=settings.algorithm
-        )
-        return encoded_jwt
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+        }

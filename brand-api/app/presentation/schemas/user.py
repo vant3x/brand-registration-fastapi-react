@@ -41,4 +41,19 @@ class UserResponse(UserBase):
 # Schema for the token response
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[EmailStr] = None
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+
+class TokenRefreshResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+

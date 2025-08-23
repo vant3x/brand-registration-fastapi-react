@@ -12,6 +12,8 @@ class BrandAlreadyExistsError(CoreException):
     def __init__(self, marca: str):
         self.marca = marca
         super().__init__(f"La marca '{marca}' ya está registrada.")
+
+
 class EmailAlreadyExistsError(CoreException):
     """Raised when an email already exists in the database."""
 
@@ -29,7 +31,9 @@ class UserNotFoundError(CoreException):
 class InvalidCredentialsException(CoreException):
     """Raised when authentication fails due to invalid credentials."""
 
-    pass
+    def __init__(self, detail: str = "Credenciales inválidas."):
+        self.detail = detail
+        super().__init__(self.detail)
 
 
 class BrandNotFoundError(CoreException):
@@ -73,7 +77,7 @@ def setup_exception_handlers(app: FastAPI):
     ):
         return JSONResponse(
             status_code=HTTP_401_UNAUTHORIZED,
-            content={"detail": "Email o contraseña incorrectos."},
+            content={"detail": exc.detail},
             headers={"WWW-Authenticate": "Bearer"},
         )
 

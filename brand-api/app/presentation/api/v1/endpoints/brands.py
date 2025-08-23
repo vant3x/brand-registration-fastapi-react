@@ -13,6 +13,9 @@ from app.application.use_cases.brand.upload_brand_image import UploadBrandImageU
 from app.presentation.api.dependencies.database import get_brand_repository
 from app.presentation.schemas.brand import BrandCreate, BrandResponse, BrandUpdate
 from app.shared.enums.brand_status import BrandStatus
+from app.domain.entities.user import User
+from app.presentation.api.dependencies.security import get_current_user
+
 
 router = APIRouter(tags=["brands"])
 
@@ -21,6 +24,7 @@ router = APIRouter(tags=["brands"])
 async def create_brand(
     brand_create: BrandCreate = Body(...),
     brand_repo=Depends(get_brand_repository),
+    current_user: User = Depends(get_current_user),
 ):
     use_case = CreateBrandUseCase(brand_repo)
     dto = CreateBrandDTO(
@@ -40,6 +44,7 @@ async def upload_brand_image(
     image_file: UploadFile = File(...),
     brand_repo=Depends(get_brand_repository),
     s3_service=Depends(get_s3_service),
+    current_user: User = Depends(get_current_user),
 ):
     use_case = UploadBrandImageUseCase(brand_repo, s3_service)
     brand = await use_case.execute(
@@ -51,7 +56,11 @@ async def upload_brand_image(
 
 
 @router.get("/{brand_id}", response_model=BrandResponse)
-async def get_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
+async def get_brand(
+    brand_id: int,
+    brand_repo=Depends(get_brand_repository),
+    current_user: User = Depends(get_current_user),
+):
     use_case = GetBrandUseCase(brand_repo)
     brand = await use_case.execute(brand_id)
     return brand
@@ -59,7 +68,9 @@ async def get_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
 
 @router.get("/", response_model=List[BrandResponse])
 async def get_all_brands(
-    skip: int = 0, limit: int = 100, brand_repo=Depends(get_brand_repository)
+    skip: int = 0,
+    limit: int = 100,
+    brand_repo=Depends(get_brand_repository),
 ):
     brands = await brand_repo.get_all(skip=skip, limit=limit)
     return brands
@@ -76,6 +87,7 @@ async def update_brand(
     imagen_file: Optional[UploadFile] = File(None),
     brand_repo=Depends(get_brand_repository),
     s3_service=Depends(get_s3_service),
+    current_user: User = Depends(get_current_user),
 ):
     image_content = None
     image_filename = None
@@ -98,7 +110,11 @@ async def update_brand(
 
 
 @router.delete("/{brand_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_brand(brand_id: int, brand_repo=Depends(get_brand_repository)):
+async def delete_brand(
+    brand_id: int,
+    brand_repo=Depends(get_brand_repository),
+    current_user: User = Depends(get_current_user),
+):
     use_case = DeleteBrandUseCase(brand_repo)
     await use_case.execute(brand_id)
     return
