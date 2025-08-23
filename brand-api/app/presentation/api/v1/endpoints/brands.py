@@ -37,15 +37,15 @@ async def create_brand(
 @router.put("/{brand_id}/image", response_model=BrandResponse)
 async def upload_brand_image(
     brand_id: int,
-    imagen_file: UploadFile = File(...),
+    image_file: UploadFile = File(...),
     brand_repo=Depends(get_brand_repository),
     s3_service=Depends(get_s3_service),
 ):
     use_case = UploadBrandImageUseCase(brand_repo, s3_service)
     brand = await use_case.execute(
         brand_id=brand_id,
-        file_content=await imagen_file.read(),
-        file_name=imagen_file.filename,
+        file_content=await image_file.read(),
+        file_name=image_file.filename,
     )
     return brand
 

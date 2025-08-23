@@ -14,7 +14,7 @@ class CreateBrandUseCase:
             titular=brand_dto.titular,
             status=brand_dto.status,
             pais_registro=brand_dto.pais_registro,
-            imagen_url=brand_dto.imagen_url,  # The URL might be passed directly, or will be None
+            imagen_url=brand_dto.imagen_url,  
             created_at=None,
             updated_at=None,
         )
