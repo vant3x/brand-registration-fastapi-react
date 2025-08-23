@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
@@ -37,7 +38,7 @@ async def root():
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-async def get_user(user_id: int, user_repo=Depends(get_user_repository)):
+async def get_user(user_id: UUID, user_repo=Depends(get_user_repository)):
     use_case = GetUserUseCase(user_repo)
     user = await use_case.execute(user_id)
 

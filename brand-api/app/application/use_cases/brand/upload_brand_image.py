@@ -22,12 +22,10 @@ class UploadBrandImageUseCase:
         file_content: bytes,
         file_name: str,
     ) -> Brand:
-        # 1. Get the existing brand
         existing_brand = await self.brand_repository.get_by_id(brand_id)
         if not existing_brand:
             raise BrandNotFoundError()
 
-        # 2. Upload the new image to S3
         file_extension = file_name.split('.')[-1]
         object_name = f"brands/{uuid.uuid4()}.{file_extension}"
         content_type, _ = mimetypes.guess_type(file_name)
@@ -38,7 +36,6 @@ class UploadBrandImageUseCase:
             content_type=content_type or "image/jpeg",
         )
 
-        # 3. Update the brand's image_url and save
         existing_brand.imagen_url = image_url
         
         updated_brand = await self.brand_repository.update(existing_brand)

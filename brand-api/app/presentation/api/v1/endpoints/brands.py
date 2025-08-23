@@ -1,4 +1,5 @@
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status, File, UploadFile, Body, Form
 
@@ -40,7 +41,7 @@ async def create_brand(
 
 @router.put("/{brand_id}/image", response_model=BrandResponse)
 async def upload_brand_image(
-    brand_id: int,
+    brand_id: UUID,
     image_file: UploadFile = File(...),
     brand_repo=Depends(get_brand_repository),
     s3_service=Depends(get_s3_service),
@@ -57,7 +58,7 @@ async def upload_brand_image(
 
 @router.get("/{brand_id}", response_model=BrandResponse)
 async def get_brand(
-    brand_id: int,
+    brand_id: UUID,
     brand_repo=Depends(get_brand_repository),
     current_user: User = Depends(get_current_user),
 ):
@@ -78,7 +79,7 @@ async def get_all_brands(
 
 @router.put("/{brand_id}", response_model=BrandResponse)
 async def update_brand(
-    brand_id: int,
+    brand_id: UUID,
     marca: Optional[str] = Form(None),
     titular: Optional[str] = Form(None),
     status: Optional[BrandStatus] = Form(None),
@@ -111,11 +112,12 @@ async def update_brand(
 
 @router.delete("/{brand_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_brand(
-    brand_id: int,
+    brand_id: UUID,
     brand_repo=Depends(get_brand_repository),
     current_user: User = Depends(get_current_user),
 ):
     use_case = DeleteBrandUseCase(brand_repo)
     await use_case.execute(brand_id)
     return
+
   

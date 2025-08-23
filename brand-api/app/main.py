@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
+from app.core.middleware import logging_and_timing_middleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
@@ -14,6 +16,8 @@ from slowapi.middleware import SlowAPIMiddleware
 settings = get_settings()
 app = FastAPI(title=settings.project_name, version="1.0.0", debug=settings.debug)
 
+# Middleware
+app.add_middleware(BaseHTTPMiddleware, dispatch=logging_and_timing_middleware)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
-from dataclasses import dataclass
-from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from app.shared.enums.brand_status import BrandStatus
 
@@ -13,7 +12,7 @@ class Brand:
     titular: str
     status: BrandStatus
 
-    id: Optional[int] = None
+    id: Optional[UUID] = None
     pais_registro: Optional[str] = 'Colombia'
     imagen_url: Optional[str] = None
     created_at: Optional[datetime] = None

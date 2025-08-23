@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 from fastapi import UploadFile
 
 from pydantic import BaseModel, Field
@@ -31,7 +32,7 @@ class BrandUpdate(BaseModel):
 
 # Schema for the response when a brand is returned
 class BrandResponse(BrandBase):
-    id: int
+    id: UUID
     pais_registro: Optional[str] = None
     imagen_url: Optional[str] = None
     created_at: datetime

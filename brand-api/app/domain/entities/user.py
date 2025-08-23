@@ -1,20 +1,20 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from app.domain.value_objects.email import Email
 
 
 @dataclass
 class User:
-    # Fields without default values
     email: Email
     hashed_password: str
 
-    # Fields with default values
+
     full_name: Optional[str] = None
     is_active: bool = True
-    id: Optional[int] = None
+    id: Optional[UUID] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
