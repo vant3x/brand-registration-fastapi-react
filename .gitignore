@@ -38,3 +38,47 @@ brand_api/logs/
 brand_api/*.db
 brand_api/*.sqlite3.env
 brand-api/.env
+
+
+# frontend
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+brand-frontend/node_modules
+brand-frontend/.pnp
+brand-frontend/.pnp.*
+brand-frontend/.yarn/*
+brand-frontend/!.yarn/patches
+brand-frontend/!.yarn/plugins
+brand-frontend/!.yarn/releases
+brand-frontend/!.yarn/versions
+
+# testing
+brand-frontend/coverage
+
+# next.js
+brand-frontend/.next/
+brand-frontend/out/
+
+# production
+brand-frontend/build
+
+# misc
+brand-frontend/.DS_Store
+brand-frontend/*.pem
+
+# debug
+brand-frontend/npm-debug.log*
+brand-frontend/yarn-debug.log*
+brand-frontend/yarn-error.log*
+brand-frontend/.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+brand-frontend/.env*
+
+# vercel
+brand-frontend/.vercel
+
+brand-frontend/# typescript
+brand-frontend/*.tsbuildinfo
+brand-frontend/next-env.d.ts
