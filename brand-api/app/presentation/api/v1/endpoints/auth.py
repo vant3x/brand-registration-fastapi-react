@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
 
 from app.application.dto.user_dto import LoginDTO
 from app.application.use_cases.auth.login_user import LoginUseCase
@@ -9,6 +8,7 @@ from app.presentation.schemas.user import (
     Token,
     RefreshTokenRequest,
     TokenRefreshResponse,
+    UserLogin,
 )
 
 router = APIRouter(tags=["auth"])
@@ -16,11 +16,11 @@ router = APIRouter(tags=["auth"])
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    login_data: UserLogin,
     user_repo=Depends(get_user_repository),
 ):
     use_case = LoginUseCase(user_repo)
-    login_dto = LoginDTO(email=form_data.username, password=form_data.password)
+    login_dto = LoginDTO(email=login_data.email, password=login_data.password)
     token_data = await use_case.execute(login_dto)
     return {
         "access_token": token_data["access_token"],

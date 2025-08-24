@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import jwt
 from app.core.config import get_settings
@@ -8,7 +8,7 @@ from app.core.exceptions import InvalidCredentialsException
 settings = get_settings()
 
 
-def create_access_token(subject: str) -> str:
+def create_access_token(subject: str, extra_data: Optional[Dict[str, Any]] = None) -> str:
     """Creates a new access token."""
     expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
     to_encode = {
@@ -16,6 +16,8 @@ def create_access_token(subject: str) -> str:
         "sub": str(subject),
         "token_type": "access",
     }
+    if extra_data:
+        to_encode.update(extra_data)
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 

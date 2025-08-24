@@ -21,5 +21,4 @@ class RefreshTokenUseCase:
         if not user or not user.is_active:
             raise UserNotFoundError(detail="User not found or inactive")
 
-        # All checks passed, create a new access token
         return jwt_service.create_access_token(subject=user.email.value)

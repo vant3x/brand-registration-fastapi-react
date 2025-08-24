@@ -7,7 +7,9 @@ from app.application.dto.user_dto import CreateUserDTO, UpdateUserDTO
 from app.application.use_cases.user.create_user import CreateUserUseCase
 from app.application.use_cases.user.get_user import GetUserUseCase
 from app.presentation.api.dependencies.database import get_user_repository
+from app.presentation.api.dependencies.auth import get_current_active_user
 from app.presentation.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.domain.entities.user import User
 
 router = APIRouter(tags=["users"])
 
@@ -32,9 +34,12 @@ async def create_user(user_data: UserCreate, user_repo=Depends(get_user_reposito
     )
 
 
-@router.get("/")
-async def root():
-    return {"message": "FastAPI CRUD - Marcassss"}
+@router.get("/me", response_model=UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    """
+    Get current user.
+    """
+    return current_user
 
 
 @router.get("/{user_id}", response_model=UserResponse)

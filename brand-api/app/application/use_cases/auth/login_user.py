@@ -22,8 +22,13 @@ class LoginUseCase:
         ):
             raise InvalidCredentialsException()
 
-        access_token = jwt_service.create_access_token(subject=user.email.value)
-        refresh_token = jwt_service.create_refresh_token(subject=user.email.value)
+        token_subject = str(user.id)
+        extra_claims = {"email": user.email.value}
+
+        access_token = jwt_service.create_access_token(
+            subject=token_subject, extra_data=extra_claims
+        )
+        refresh_token = jwt_service.create_refresh_token(subject=token_subject)
 
         return {
             "access_token": access_token,
