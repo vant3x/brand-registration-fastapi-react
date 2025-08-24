@@ -1,4 +1,5 @@
 from typing import List, Optional
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,7 +26,8 @@ class UserRepositoryImpl(UserRepository):
         await self._db_session.refresh(db_user)
         return self._to_entity(db_user)
 
-    async def get_by_id(self, user_id: int) -> Optional[User]:
+    async def get_by_id(self, user_id: UUID) -> Optional[User]:
+        print(f"DEBUG: get_by_id received user_id: {user_id}")
         result = await self._db_session.execute(
             select(UserModel).where(UserModel.id == user_id)
         )

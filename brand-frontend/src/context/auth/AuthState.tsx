@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect, useCallback } from "react";
 import AuthContext from "./AuthContext";
 import authReducer from "./AuthReducer";
 
@@ -23,7 +23,7 @@ import { Props } from "../../interfaces/Props.interface";
 
 const AuthState = ({ children }: Props) => {
   const initialState = {
-    token: null, // El access_token vivirá aquí, en memoria
+    token: null,
     auth: null,
     user: null,
     message: null,
@@ -31,72 +31,23 @@ const AuthState = ({ children }: Props) => {
     signupStatus: null
   };
 
-  // definir reducer
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // registrar nuevos usuarios
-  const signup = async (values: any) => {
-    try {
-      const response = await axiosClient.post("/users/", values);
-      dispatch({
-        type: SIGNUP_SUCCESS,
-        payload: {
-          message: "Usuario creado correctamente", // Opcional: puedes usar un mensaje de la respuesta
-          status: 201
-        }
-      });
-    } catch (error: any) {
-      dispatch({
-        type: SIGNUP_ERROR,
-        payload: error.response.data.detail,
-      });
+  const logout = useCallback(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("refreshToken");
     }
-    // limpia la alerta
-    setTimeout(() => {
-      dispatch({
-        type: REMOVE_ALERTS,
-      });
-    }, 4000);
-  };
+    authToken(null);
+    dispatch({
+      type: LOGOUT,
+    });
+  }, []);
 
-  // autenticar usuarios
-  const login = async (values: any) => {
-    try {
-      const response = await axiosClient.post("/auth/token", values);
-      const { access_token, refresh_token } = response.data;
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem("refreshToken", refresh_token);
-      }
-
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: { token: access_token },
-      });
-
-      // Inmediatamente después del login, obtenemos los datos del usuario
-      await userAuthtenticate(access_token);
-
-    } catch (error: any) {
-      dispatch({
-        type: LOGIN_ERROR,
-        payload: error.response.data.detail,
-      });
-    }
-    // limpia la alerta
-    setTimeout(() => {
-      dispatch({
-        type: REMOVE_ALERTS,
-      });
-    }, 4000);
-  };
-
-  // Retorna el usuario autenticado en base al JWT
-  const userAuthtenticate = async (token: string | null) => {
-    authToken(token); // Configura o limpia el token en las cabeceras de Axios
+  const userAuthtenticate = useCallback(async (token: string | null) => {
+    authToken(token);
 
     if (!token) {
-        dispatch({ type: LOGOUT });
+        logout();
         return;
     }
 
@@ -113,22 +64,87 @@ const AuthState = ({ children }: Props) => {
         type: SESSION_ERROR,
         payload: error?.response?.data?.detail,
       });
-      // Si falla la autenticación del usuario, cerramos sesión
       logout();
     }
-  };
+  }, [logout]);
 
-
-  // cerrar la sesion
-  const logout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("refreshToken");
+  const signup = async (values: any) => {
+    try {
+      const response = await axiosClient.post("/users/", values);
+      dispatch({
+        type: SIGNUP_SUCCESS,
+        payload: {
+          message: "Usuario creado correctamente",
+          status: 201
+        }
+      });
+    } catch (error: any) {
+      dispatch({
+        type: SIGNUP_ERROR,
+        payload: error.response.data.detail,
+      });
     }
-    authToken(null); // Limpia la cabecera de autorización
-    dispatch({
-      type: LOGOUT,
-    });
+    setTimeout(() => {
+      dispatch({
+        type: REMOVE_ALERTS,
+      });
+    }, 4000);
   };
+
+  const login = async (values: any) => {
+    try {
+      const response = await axiosClient.post("/auth/token", values);
+      const { access_token, refresh_token } = response.data;
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("refreshToken", refresh_token);
+      }
+
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: { token: access_token },
+      });
+
+      await userAuthtenticate(access_token);
+
+    } catch (error: any) {
+      dispatch({
+        type: LOGIN_ERROR,
+        payload: error.response.data.detail,
+      });
+    }
+    setTimeout(() => {
+      dispatch({
+        type: REMOVE_ALERTS,
+      });
+    }, 4000);
+  };
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      if (typeof window === "undefined") return;
+
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        try {
+          const response = await axiosClient.post("/auth/refresh", { refresh_token: refreshToken });
+          const { access_token } = response.data;
+
+          dispatch({
+            type: LOGIN_SUCCESS,
+            payload: { token: access_token },
+          });
+          await userAuthtenticate(access_token);
+        } catch (error) {
+          logout();
+        }
+      } else {
+        logout();
+      }
+    };
+
+    checkAuthStatus();
+  }, [userAuthtenticate, logout]);
 
   return (
     <AuthContext.Provider

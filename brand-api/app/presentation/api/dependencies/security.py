@@ -1,4 +1,6 @@
 
+from uuid import UUID
+
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from starlette import status
@@ -22,8 +24,8 @@ async def get_current_user(
         if payload.get("token_type") != "access":
             raise InvalidCredentialsException(detail="Invalid token type")
 
-        email: str = payload.get("sub")
-        if email is None:
+        user_id: str = payload.get("sub")
+        if user_id is None:
             raise InvalidCredentialsException(detail="Invalid token payload")
 
     except InvalidCredentialsException as e:
@@ -33,7 +35,12 @@ async def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = await user_repo.get_by_email(email=email)
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError:
+        raise InvalidCredentialsException(detail="Invalid user ID format in token")
+
+    user = await user_repo.get_by_id(user_uuid)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -45,3 +52,11 @@ async def get_current_user(
         raise HTTPException(status_code=400, detail="Inactive user")
 
     return user
+
+
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user

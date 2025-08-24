@@ -12,27 +12,27 @@ import { SitemarkIcon } from './CustomIcons';
 const items = [
   {
     icon: <SettingsSuggestRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Adaptable performance',
+    title: 'Gestión eficiente de marcas',
     description:
-      'Our product effortlessly adjusts to your needs, boosting efficiency and simplifying your tasks.',
+      'Nuestra plataforma se adapta a tus necesidades, optimizando la eficiencia y simplificando la gestión de tus marcas.',
   },
   {
     icon: <ConstructionRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Built to last',
+    title: 'Seguridad y durabilidad de tus datos',
     description:
-      'Experience unmatched durability that goes above and beyond with lasting investment.',
+      'Experimenta una durabilidad inigualable que va más allá, asegurando una inversión duradera en la protección de tus marcas.',
   },
   {
     icon: <ThumbUpAltRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Great user experience',
+    title: 'Interfaz intuitiva y fácil de usar',
     description:
-      'Integrate our product into your routine with an intuitive and easy-to-use interface.',
+      'Integra nuestra herramienta en tu rutina con una interfaz sencilla y amigable, diseñada para tu comodidad.',
   },
   {
     icon: <AutoFixHighRoundedIcon sx={{ color: 'text.secondary' }} />,
-    title: 'Innovative functionality',
+    title: 'Herramientas avanzadas para tu gestión',
     description:
-      'Stay ahead with features that set new standards, addressing your evolving needs better than the rest.',
+      'Mantente a la vanguardia con funcionalidades que establecen nuevos estándares, abordando tus necesidades de gestión de marcas de manera superior.',
   },
 ];
 

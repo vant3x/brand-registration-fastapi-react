@@ -18,6 +18,7 @@ import { SitemarkIcon } from './CustomIcons';
 
 import authContext from "../../../context/auth/AuthContext";
 import { AuthContextType } from "../../../interfaces/AuthContextType";
+import axiosClient from "../../../config/axios";
 
 interface IFormInput {
   email: string;
@@ -94,10 +95,10 @@ export default function SignInCard() {
             fullWidth
             variant="outlined"
             {...register('email', { 
-              required: 'Please enter your email address.',
+              required: 'Por favor, introduce tu dirección de correo electrónico.',
               pattern: {
                 value: /\S+@\S+\.\S+/,
-                message: 'Please enter a valid email address.'
+                message: 'Por favor, introduce una dirección de correo electrónico válida.'
               }
             })}
             error={!!errors.email}
@@ -107,7 +108,7 @@ export default function SignInCard() {
         </FormControl>
         <FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormLabel htmlFor="password">Contraseña</FormLabel>
             <Link
               component="button"
               type="button"
@@ -128,13 +129,12 @@ export default function SignInCard() {
             variant="outlined"
          
             {...register('password', {
-              required: 'Please enter your password.',
+              required: 'Por favor, introduce tu contraseña.',
               minLength: {
                 value: 6,
-                message: 'Password must be at least 6 characters long.'
+                message: 'La contraseña debe tener al menos 6 caracteres.'
               }
             })}
-            // Display errors if any
             error={!!errors.password}
             helperText={errors.password?.message}
             color={errors.password ? 'error' : 'primary'}
@@ -142,26 +142,26 @@ export default function SignInCard() {
         </FormControl>
         <FormControlLabel
           control={<Checkbox color="primary" {...register('remember')} />}
-          label="Remember me"
+          label="Recordarme"
         />
         <ForgotPassword open={open} handleClose={handleClose} />
         <Button type="submit" fullWidth variant="contained">
-          Sign in
+          Iniciar Sesión
         </Button>
         <Typography sx={{ textAlign: 'center' }}>
-          Don&apos;t have an account?{' '}
+          ¿No tienes una cuenta?{' '}
           <span>
             <Link
               href="/material-ui/getting-started/templates/sign-in/"
               variant="body2"
               sx={{ alignSelf: 'center' }}
             >
-              Sign up
+              Registrarse
             </Link>
           </span>
         </Typography>
       </form>
-      <Divider>or</Divider>
+      <Divider>o</Divider>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         
       </Box>

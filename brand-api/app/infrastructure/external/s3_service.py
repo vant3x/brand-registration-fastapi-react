@@ -53,3 +53,19 @@ class S3Service:
             # Log the error for debugging
             logger.error(f"Error uploading file to S3: {e}")
             raise
+
+    def create_presigned_url(self, object_name: str, expiration: int = 3600):
+        """Generate a presigned URL to share an S3 object"""
+        if self.s3_client is None:
+            logger.error("S3Service is not configured. Cannot create presigned URL.")
+            raise RuntimeError("S3 service is not configured.")
+        try:
+            response = self.s3_client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': self.bucket_name, 'Key': object_name},
+                ExpiresIn=expiration
+            )
+        except ClientError as e:
+            logger.error(f"Error generating presigned URL: {e}")
+            raise
+        return response

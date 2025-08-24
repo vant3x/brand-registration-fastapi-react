@@ -25,7 +25,9 @@ class EmailAlreadyExistsError(CoreException):
 class UserNotFoundError(CoreException):
     """Raised when a user is not found in the database."""
 
-    pass
+    def __init__(self, detail: str = "Usuario no encontrado."):
+        self.detail = detail
+        super().__init__(self.detail)
 
 
 class InvalidCredentialsException(CoreException):

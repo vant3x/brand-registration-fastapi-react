@@ -20,7 +20,7 @@ const authReducer = (state: any, action: any) => {
         case LOGIN_SUCCESS:
             return {
                 ...state,
-                token: action.payload.token, // Guardamos el access_token en el estado
+                token: action.payload.token,
                 auth: true,
                 message: null,
                 errorSession: null

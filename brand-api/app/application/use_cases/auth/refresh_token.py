@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from app.core.exceptions import InvalidCredentialsException, UserNotFoundError
 from app.domain.repositories.user_repository import UserRepository
 from app.domain.services import jwt_service
@@ -13,12 +15,14 @@ class RefreshTokenUseCase:
         if payload.get("token_type") != "refresh":
             raise InvalidCredentialsException(detail="Invalid token type for refreshing")
 
-        email = payload.get("sub")
-        if not email:
+        user_id_str = payload.get("sub")
+        if not user_id_str:
             raise InvalidCredentialsException(detail="Invalid token payload")
 
-        user = await self.user_repository.get_by_email(email)
+        user = await self.user_repository.get_by_id(UUID(user_id_str))
         if not user or not user.is_active:
             raise UserNotFoundError(detail="User not found or inactive")
 
-        return jwt_service.create_access_token(subject=user.email.value)
+        token_subject = str(user.id)
+        extra_claims = {"email": user.email.value}
+        return jwt_service.create_access_token(subject=token_subject, extra_data=extra_claims)

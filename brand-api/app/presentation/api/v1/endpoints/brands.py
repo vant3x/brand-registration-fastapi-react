@@ -11,6 +11,7 @@ from app.application.use_cases.brand.delete_brand import DeleteBrandUseCase
 from app.application.use_cases.brand.get_brand import GetBrandUseCase
 from app.application.use_cases.brand.update_brand import UpdateBrandUseCase
 from app.application.use_cases.brand.upload_brand_image import UploadBrandImageUseCase
+from app.application.use_cases.brand.get_presigned_url import GetPresignedUrlUseCase
 from app.presentation.api.dependencies.database import get_brand_repository
 from app.presentation.schemas.brand import BrandCreate, BrandResponse, BrandUpdate
 from app.shared.enums.brand_status import BrandStatus
@@ -54,6 +55,18 @@ async def upload_brand_image(
         file_name=image_file.filename,
     )
     return brand
+
+
+@router.get("/{brand_id}/image/presigned-url", response_model=str)
+async def get_brand_image_presigned_url(
+    brand_id: UUID,
+    brand_repo=Depends(get_brand_repository),
+    s3_service=Depends(get_s3_service),
+    current_user: User = Depends(get_current_user),
+):
+    use_case = GetPresignedUrlUseCase(brand_repo, s3_service)
+    presigned_url = await use_case.execute(brand_id)
+    return presigned_url
 
 
 @router.get("/{brand_id}", response_model=BrandResponse)
