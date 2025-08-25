@@ -9,7 +9,29 @@ import {
     LOGOUT
 } from '../types';
 
-const authReducer = (state: any, action: any) => {
+// Define the State type
+interface AuthState {
+    token: string | null;
+    auth: boolean | null;
+    user: any | null; // User type can be refined later
+    message: string | null;
+    errorSession: any | null; // Error session type can be refined later
+    signupStatus: number | null;
+}
+
+// Define Action types
+type AuthAction =
+    | { type: typeof SIGNUP_SUCCESS; payload: { message: string; status: number } }
+    | { type: typeof LOGIN_SUCCESS; payload: { token: string } }
+    | { type: typeof USER_AUTHENTICATE; payload: any } // User payload type can be refined
+    | { type: typeof LOGOUT }
+    | { type: typeof LOGIN_ERROR; payload: any } // Error payload type can be refined
+    | { type: typeof SESSION_ERROR; payload: any } // Error payload type can be refined
+    | { type: typeof SIGNUP_ERROR; payload: any } // Error payload type can be refined
+    | { type: typeof REMOVE_ALERTS };
+
+
+const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     switch (action.type) {
         case SIGNUP_SUCCESS:
             return {

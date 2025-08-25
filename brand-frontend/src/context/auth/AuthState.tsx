@@ -23,14 +23,39 @@ import { Props } from "../../interfaces/Props.interface";
 import AppContext from "../app/AppContext"; // Import AppContext
 import { AppContextType } from "../../interfaces/AppContextType"; // Import AppContextType
 
+// Import AuthState from AuthReducer to ensure consistency
+import { AuthState as ReducerAuthState } from "./AuthReducer";
+
+// Define interfaces for form values
+interface LoginFormValues {
+  email: string;
+  password: string;
+  remember?: boolean;
+}
+
+interface SignupFormValues {
+  // Assuming signup has at least email and password, add other fields as needed
+  email: string;
+  password: string;
+  [key: string]: any; // Allow other properties for now if not fully defined
+}
+
+// Define interface for Axios error response
+interface AxiosErrorResponse {
+  response?: {
+    data?: {
+      detail?: string;
+    };
+  };
+}
 
 const AuthState = ({ children }: Props) => {
-  const initialState = {
+  const initialState: ReducerAuthState = { // Use ReducerAuthState for initialState
     token: null,
     auth: null,
     user: null,
     message: null,
-    errorSession: {},
+    errorSession: null, // Changed from {} to null for consistency with ReducerAuthState
     signupStatus: null
   };
 
@@ -70,7 +95,7 @@ const AuthState = ({ children }: Props) => {
           payload: response.data,
         });
       }
-    } catch (error: any) { 
+    } catch (error: AxiosErrorResponse) { // Typed error
       dispatch({
         type: SESSION_ERROR,
         payload: error?.response?.data?.detail,
@@ -79,9 +104,9 @@ const AuthState = ({ children }: Props) => {
     }
   }, [logout]);
 
-  const signup = async (values: any) => {
+  const signup = async (values: SignupFormValues) => { // Typed values
     try {
-      const response = await axiosClient.post("/users/", values);
+      await axiosClient.post("/users/", values); // Removed unused 'response' variable
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: {
@@ -90,12 +115,12 @@ const AuthState = ({ children }: Props) => {
         }
       });
       showSnackbar("Usuario creado correctamente", "success"); // Show success snackbar
-    } catch (error: any) {
+    } catch (error: AxiosErrorResponse) { // Typed error
       dispatch({
         type: SIGNUP_ERROR,
-        payload: error.response.data.detail,
+        payload: error.response?.data?.detail, // Added optional chaining
       });
-      showSnackbar(error.response.data.detail || "Error al crear usuario", "error"); // Show error snackbar
+      showSnackbar(error.response?.data?.detail || "Error al crear usuario", "error"); // Show error snackbar, added optional chaining
     }
     setTimeout(() => {
       dispatch({
@@ -104,7 +129,7 @@ const AuthState = ({ children }: Props) => {
     }, 4000);
   };
 
-  const login = async (values: any) => {
+  const login = async (values: LoginFormValues) => { // Typed values
     try {
       const response = await axiosClient.post("/auth/token", values);
       const { access_token, refresh_token } = response.data;
@@ -123,12 +148,12 @@ const AuthState = ({ children }: Props) => {
       await userAuthtenticate(access_token);
       showSnackbar("Inicio de sesión exitoso", "success"); // Show success snackbar
 
-    } catch (error: any) {
+    } catch (error: AxiosErrorResponse) { // Typed error
       dispatch({
         type: LOGIN_ERROR,
-        payload: error.response.data.detail,
+        payload: error.response?.data?.detail,
       });
-      showSnackbar(error.response.data.detail || "Credenciales incorrectas", "error"); // Show error snackbar
+      showSnackbar(error.response?.data?.detail || "Credenciales incorrectas", "error"); // Show error snackbar
     }
     // Removed setTimeout for REMOVE_ALERTS as snackbar handles auto-hide
   };
