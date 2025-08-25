@@ -29,6 +29,8 @@ import { useRouter } from 'next/navigation'; // Import useRouter
 import { deleteBrand } from '../../services/brandService';
 import DeleteBrandDialog from './DeleteBrandDialog';
 import BrandDetailModal from './BrandDetailModal'; // Import the new modal component
+import BrandTableRow from './BrandTableRow';
+import BrandTableHead from './BrandTableHead';
 import AppContext from '../../context/app/AppContext';
 import { AppContextType } from '../../interfaces/AppContextType';
 
@@ -67,112 +69,7 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-interface HeadCell {
-  disablePadding: boolean;
-  id: keyof Brand | 'acciones';
-  label: string;
-  numeric: boolean;
-}
 
-const headCells: readonly HeadCell[] = [
-  {
-    id: 'marca',
-    numeric: false,
-    disablePadding: true,
-    label: 'Marca',
-  },
-  {
-    id: 'titular',
-    numeric: false,
-    disablePadding: false,
-    label: 'Titular',
-  },
-  {
-    id: 'status',
-    numeric: false,
-    disablePadding: false,
-    label: 'Estado',
-  },
-  {
-    id: 'pais_registro',
-    numeric: false,
-    disablePadding: false,
-    label: 'País de Registro',
-  },
-  {
-    id: 'imagen_url',
-    numeric: false,
-    disablePadding: false,
-    label: 'Imagen',
-  },
-  {
-    id: 'acciones',
-    numeric: false,
-    disablePadding: false,
-    label: 'Acciones',
-  },
-];
-
-interface EnhancedTableProps {
-  numSelected: number;
-  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Brand) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-    props;
-  const createSortHandler =
-    (property: keyof Brand) => (event: React.MouseEvent<unknown>) => {
-      onRequestSort(event, property);
-    };
-
-  return (
-    <TableHead>
-      <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              'aria-label': 'seleccionar todas las marcas',
-            }}
-          />
-        </TableCell>
-        {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
-            padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-          >
-            {headCell.id !== 'acciones' ? (
-              <TableSortLabel
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={createSortHandler(headCell.id as keyof Brand)}
-              >
-                {headCell.label}
-                {orderBy === headCell.id ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc' ? 'ordenado descendente' : 'ordenado ascendente'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            ) : (
-              headCell.label
-            )}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-}
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
@@ -365,7 +262,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
-            <EnhancedTableHead
+            <BrandTableHead
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
@@ -379,60 +276,16 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
+                  <BrandTableRow
                     key={brand.id}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                        onClick={(event) => handleClick(event, brand.id)} 
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
-                    >
-                      {brand.marca}
-                    </TableCell>
-                    <TableCell align="left">{brand.titular}</TableCell>
-                    <TableCell align="left">{brand.status}</TableCell>
-                    <TableCell align="left">{brand.pais_registro}</TableCell>
-                    <TableCell align="left">
-                      {brand.imagen_url ? (
-                        <img src={brand.imagen_url} alt={brand.marca} style={{ width: 50, height: 50, objectFit: 'cover' }} />
-                      ) : (
-                        'N/A'
-                      )}
-                    </TableCell>
-                    <TableCell align="left">
-                      <Tooltip title="Ver">
-                        <IconButton onClick={() => handleView(brand.id)} size="small">
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Editar">
-                        <IconButton onClick={() => handleEdit(brand.id)} size="small">
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Eliminar">
-                        <IconButton onClick={() => handleDelete(brand.id)} size="small">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
+                    brand={brand}
+                    isItemSelected={isItemSelected}
+                    labelId={labelId}
+                    handleClick={handleClick}
+                    handleView={handleView}
+                    handleEdit={handleEdit}
+                    handleDelete={handleDelete}
+                  />
                 );
               })}
               {emptyRows > 0 && (

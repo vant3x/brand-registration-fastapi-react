@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
@@ -56,7 +56,7 @@ export default function SignInCard() {
     }
   }, [auth, router]);
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   
   const { register, handleSubmit, formState: { errors } } = useForm<IFormInput>();
 

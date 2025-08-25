@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useContext } from 'react';
-import { Card, CardContent, CardMedia, Typography, Box } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Box, CardActions, Button } from '@mui/material';
+import { useRouter } from 'next/navigation';
+
 import axiosInstance from '../../config/axios';
 import AuthContext from '../../context/auth/AuthContext';
 
@@ -18,13 +20,15 @@ interface Brand {
 
 interface BrandItemProps {
   brand: Brand;
+  onViewDetails: (brand: Brand) => void; 
 }
 
-const BrandItem: React.FC<BrandItemProps> = ({ brand }) => {
+const BrandItem: React.FC<BrandItemProps> = ({ brand, onViewDetails }) => {
   const [presignedImageUrl, setPresignedImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { auth } = useContext(AuthContext);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPresignedUrl = async () => {
@@ -74,6 +78,11 @@ const BrandItem: React.FC<BrandItemProps> = ({ brand }) => {
           País: {brand.pais_registro}
         </Typography>
       </CardContent>
+      <CardActions>
+        <Button size="small" onClick={() => onViewDetails(brand)}>Ver Detalles</Button>
+        <Button size="small" onClick={() => router.push('/marcas/editar/'+brand.id)}>Editar</Button>
+        <Button size="small" onClick={() => onViewDetails(brand)}>Eliminar</Button>
+      </CardActions>
     </Card>
   );
 };

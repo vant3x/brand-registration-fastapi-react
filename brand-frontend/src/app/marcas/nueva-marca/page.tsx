@@ -1,11 +1,12 @@
 import MainLayout from '../../../components/layout/MainLayout';
-import BrandRegistrationForm from '../../../components/forms/BrandRegistrationForm';
+import BrandStepperForm from '../../../components/forms/BrandStepperForm';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness'; 
 
 export default function NewBrandPage() {
     return (
         <MainLayout>
-            <h1>Registrar Nueva Marca</h1>
-            <BrandRegistrationForm /> 
+            <h1><AddBusinessIcon/> Registrar Nueva Marca  </h1>
+            <BrandStepperForm /> 
         </MainLayout>
     );
 }

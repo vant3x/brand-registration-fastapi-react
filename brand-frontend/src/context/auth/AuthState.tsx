@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback } from "react";
+import React, { useReducer, useEffect, useCallback, useContext } from "react"; // Added useContext
 import AuthContext from "./AuthContext";
 import authReducer from "./AuthReducer";
 import Cookies from 'js-cookie';
@@ -20,6 +20,8 @@ import {
 import axiosClient from "../../config/axios";
 import authToken from "../../config/authToken";
 import { Props } from "../../interfaces/Props.interface";
+import AppContext from "../app/AppContext"; // Import AppContext
+import { AppContextType } from "../../interfaces/AppContextType"; // Import AppContextType
 
 
 const AuthState = ({ children }: Props) => {
@@ -33,6 +35,13 @@ const AuthState = ({ children }: Props) => {
   };
 
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const appCtx = useContext<AppContextType | undefined>(AppContext); // Use AppContext
+
+  if (!appCtx) {
+    throw new Error("AuthState must be used within an AppProvider");
+  }
+
+  const { showSnackbar } = appCtx; // Get showSnackbar from AppContext
 
   const logout = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -80,11 +89,13 @@ const AuthState = ({ children }: Props) => {
           status: 201
         }
       });
+      showSnackbar("Usuario creado correctamente", "success"); // Show success snackbar
     } catch (error: any) {
       dispatch({
         type: SIGNUP_ERROR,
         payload: error.response.data.detail,
       });
+      showSnackbar(error.response.data.detail || "Error al crear usuario", "error"); // Show error snackbar
     }
     setTimeout(() => {
       dispatch({
@@ -110,18 +121,16 @@ const AuthState = ({ children }: Props) => {
       console.log('Setting token cookie with access_token:', access_token);
       Cookies.set('token', access_token, { path: '/', expires: 7 }); // Set cookie for middleware
       await userAuthtenticate(access_token);
+      showSnackbar("Inicio de sesión exitoso", "success"); // Show success snackbar
 
     } catch (error: any) {
       dispatch({
         type: LOGIN_ERROR,
         payload: error.response.data.detail,
       });
+      showSnackbar(error.response.data.detail || "Credenciales incorrectas", "error"); // Show error snackbar
     }
-    setTimeout(() => {
-      dispatch({
-        type: REMOVE_ALERTS,
-      });
-    }, 4000);
+    // Removed setTimeout for REMOVE_ALERTS as snackbar handles auto-hide
   };
 
   useEffect(() => {

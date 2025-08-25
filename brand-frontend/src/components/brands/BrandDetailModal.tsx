@@ -43,7 +43,7 @@ const BrandDetailModal: React.FC<BrandDetailModalProps> = ({ open, onClose, bran
     const fetchPresignedUrl = async () => {
       if (!brand?.id || !auth || !brand.imagen_url) {
         setLoadingImage(false);
-        setPresignedImageUrl(null); // Clear previous image if no new one
+        setPresignedImageUrl(null); 
         return;
       }
       setLoadingImage(true);
@@ -54,7 +54,7 @@ const BrandDetailModal: React.FC<BrandDetailModalProps> = ({ open, onClose, bran
       } catch (err) {
         console.error("Error fetching presigned URL:", err);
         setImageError("Error al cargar la imagen.");
-        setPresignedImageUrl(null); // Ensure no old image is shown on error
+        setPresignedImageUrl(null); 
       } finally {
         setLoadingImage(false);
       }
@@ -63,7 +63,6 @@ const BrandDetailModal: React.FC<BrandDetailModalProps> = ({ open, onClose, bran
     if (open && brand) {
       fetchPresignedUrl();
     } else {
-      // Reset state when modal closes or brand changes
       setPresignedImageUrl(null);
       setLoadingImage(true);
       setImageError(null);

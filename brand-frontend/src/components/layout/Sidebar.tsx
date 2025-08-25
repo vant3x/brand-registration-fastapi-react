@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </ListItemButton>
         </ListItem>
         {auth && (
-          <ListItem disablePadding component={Link} href="/marcas/nueva-marca-w">
+          <ListItem disablePadding component={Link} href="/marcas/nueva-marca">
             <ListItemButton>
               <ListItemIcon>
                 <AddBusinessIcon />

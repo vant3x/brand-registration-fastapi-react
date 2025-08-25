@@ -147,7 +147,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: 0.0.0.0/0 # WARNING: For production, restrict this to known IPs
+          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -211,8 +211,8 @@ Resources:
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess # WARNING: For production, restrict to specific bucket
-        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly # For pulling Docker images from ECR
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess 
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly 
       Tags:
         - Key: Name
           Value: !Sub '${EnvironmentName}-EC2Role'

@@ -3,17 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import BrandList from '../../components/brands/BrandList';
-import axiosClient from '../../config/axios';
 import { Box, CircularProgress, Typography } from '@mui/material';
-
-interface Brand {
-  id: string;
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url?: string;
-}
+import { getBrands, Brand } from '../../services/brandService'; // Import getBrands and Brand interface
 
 export default function BrandsListPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -24,8 +15,8 @@ export default function BrandsListPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axiosClient.get<Brand[]>('/brands');
-      setBrands(res.data);
+      const data = await getBrands(); // Use the service function
+      setBrands(data);
     } catch (err) {
       console.error("Error fetching brands:", err);
       setError("No se pudieron cargar las marcas o no hay marcas disponibles.");

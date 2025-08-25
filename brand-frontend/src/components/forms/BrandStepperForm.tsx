@@ -1,5 +1,5 @@
 'use client';
-import * as React from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-import axiosClient from '../../config/axios'; // Import the configured axios instance
+import axiosClient from '../../config/axios'; 
 import { useRouter } from 'next/navigation';
 import CircularProgress from '@mui/material/CircularProgress';
 
@@ -39,9 +39,9 @@ export default function BrandStepperForm() {
     pais_registro: '',
     imagen_url: '',
   });
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [success, setSuccess] = React.useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>) => {
     const { name, value } = e.target;
@@ -65,8 +65,8 @@ export default function BrandStepperForm() {
         status: '',
         pais_registro: '',
         imagen_url: '',
-      }); // Clear form after successful submission
-      router.push('/marcas'); // Redirect after successful registration
+      }); 
+      router.push('/marcas'); 
     } catch (err: any) {
       console.error('Error registering brand:', err);
       setError(err.response?.data?.detail || 'Error al registrar la marca.');
@@ -95,8 +95,7 @@ export default function BrandStepperForm() {
   const handleNext = () => {
     const newActiveStep =
       isLastStep() && !allStepsCompleted()
-        ? // It's the last step, but not all steps have been completed,
-          // find the first step that has been completed
+        ? 
           steps.findIndex((step, i) => !(i in completed))
         : activeStep + 1;
     setActiveStep(newActiveStep);
@@ -179,9 +178,10 @@ export default function BrandStepperForm() {
                 label="Status"
                 onChange={handleChange}
               >
-                <MenuItem value="ACTIVO">ACTIVO</MenuItem>
-                <MenuItem value="INACTIVA">INACTIVA</MenuItem>
-                <MenuItem value="PENDIENTE">PENDIENTE</MenuItem>
+                <MenuItem value="activo">ACTIVO</MenuItem>
+                <MenuItem value="inactivo">INACTIVO</MenuItem>
+                <MenuItem value="pendiente de aprobacion">PENDIENTE DE APROBACION</MenuItem>
+                <MenuItem value="rechazado">RECHAZADO</MenuItem>
               </Select>
             </FormControl>
           </Box>

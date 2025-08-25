@@ -37,7 +37,10 @@ const BrandRegistrationForm: React.FC<BrandRegistrationFormProps> = ({
     brandId,
 }) => {
     const router = useRouter();
-    const [formData, setFormData] = useState<BrandFormData>(initialData || {
+    const [formData, setFormData] = useState<BrandFormData>(initialData ? {
+        ...initialData,
+        imagen_url: initialData.imagen_url || '', // Ensure imagen_url is always a string
+    } : {
         marca: '',
         titular: '',
         status: '',
