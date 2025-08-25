@@ -28,6 +28,7 @@ import { visuallyHidden } from '@mui/utils';
 import { useRouter } from 'next/navigation'; // Import useRouter
 import { deleteBrand } from '../../services/brandService';
 import DeleteBrandDialog from './DeleteBrandDialog';
+import BrandDetailModal from './BrandDetailModal'; // Import the new modal component
 import AppContext from '../../context/app/AppContext';
 import { AppContextType } from '../../interfaces/AppContextType';
 
@@ -38,6 +39,8 @@ interface Brand {
   status: string;
   pais_registro: string;
   imagen_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -241,6 +244,8 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [brandToDeleteId, setBrandToDeleteId] = React.useState<string | null>(null);
+  const [openBrandDetailModal, setOpenBrandDetailModal] = React.useState(false); // New state for modal
+  const [selectedBrandForModal, setSelectedBrandForModal] = React.useState<Brand | null>(null); // New state for selected brand
 
   const appCtx = React.useContext<AppContextType | undefined>(AppContext);
 
@@ -312,12 +317,21 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
   );
 
   const handleView = (id: string) => {
-    console.log(`Ver marca con ID: ${id}`);
+    const brand = initialBrands.find(b => b.id === id);
+    if (brand) {
+      setSelectedBrandForModal(brand);
+      setOpenBrandDetailModal(true);
+    }
+  };
+
+  const handleCloseBrandDetailModal = () => {
+    setOpenBrandDetailModal(false);
+    setSelectedBrandForModal(null);
   };
 
   const router = useRouter();
   const handleEdit = (id: string) => {
-    router.push(`/marcas/${id}`);
+    router.push(`/marcas/editar/${id}`);
   };
 
   const handleConfirmDelete = async (id: string) => {
@@ -340,9 +354,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
     setBrandToDeleteId(id);
     setOpenDeleteDialog(true);
   };
-
   
-
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -446,16 +458,19 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Relleno denso"
-      />
+  
 
       <DeleteBrandDialog
         open={openDeleteDialog}
         brandId={brandToDeleteId}
         onClose={() => setOpenDeleteDialog(false)}
         onConfirmDelete={handleConfirmDelete}
+      />
+
+      <BrandDetailModal
+        open={openBrandDetailModal}
+        onClose={handleCloseBrandDetailModal}
+        brand={selectedBrandForModal}
       />
     </Box>
   );

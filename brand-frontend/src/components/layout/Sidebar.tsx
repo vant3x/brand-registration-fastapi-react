@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, Divider, Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import Link from 'next/link';
 import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark'; 
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'; 
-
+import Image from "next/image";
+import AuthContext from '../../context/auth/AuthContext';
 interface SidebarProps {
   drawerWidth: number;
   mobileOpen: boolean;
@@ -17,12 +18,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen,
   handleDrawerToggle,
 }) => {
+  const { auth } = useContext(AuthContext);
   const drawer = (
     <div>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          Menú
-        </Typography>
+      
+        <Image       src="/assets/image.webp"
+        width={140}
+        height={140}
+        alt="Logo" />
       </Toolbar>
       <Divider />
       <List>
@@ -43,14 +47,16 @@ const Sidebar: React.FC<SidebarProps> = ({
             <ListItemText primary="Listar Marcas" />
           </ListItemButton>
         </ListItem>
-        <ListItem disablePadding component={Link} href="/marcas/nueva-marca">
-          <ListItemButton>
-            <ListItemIcon>
-              <AddBusinessIcon />
-            </ListItemIcon>
-            <ListItemText primary="Registrar Marca" />
-          </ListItemButton>
-        </ListItem>
+        {auth && (
+          <ListItem disablePadding component={Link} href="/marcas/nueva-marca-w">
+            <ListItemButton>
+              <ListItemIcon>
+                <AddBusinessIcon />
+              </ListItemIcon>
+              <ListItemText primary="Registrar Marca" />
+            </ListItemButton>
+          </ListItem>
+        )}
         
       </List>
       <Divider />

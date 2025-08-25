@@ -1,5 +1,5 @@
-import MainLayout from '../../../components/layout/MainLayout';
-import BrandDetailsClient from '../../../components/brands/BrandDetailsClient';
+import MainLayout from '../../../../components/layout/MainLayout';
+import BrandDetailsClient from '../../../../components/brands/BrandDetailsClient';
 import { Typography } from '@mui/material';
 
 interface BrandEditPageProps {

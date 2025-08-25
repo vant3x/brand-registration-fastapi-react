@@ -3,6 +3,7 @@
 import React, { useReducer, useEffect, useCallback } from "react";
 import AuthContext from "./AuthContext";
 import authReducer from "./AuthReducer";
+import Cookies from 'js-cookie';
 
 
 import {
@@ -37,6 +38,7 @@ const AuthState = ({ children }: Props) => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("refreshToken");
     }
+    Cookies.remove('token', { path: '/' }); // Remove cookie on logout
     authToken(null);
     dispatch({
       type: LOGOUT,
@@ -105,6 +107,8 @@ const AuthState = ({ children }: Props) => {
         payload: { token: access_token },
       });
 
+      console.log('Setting token cookie with access_token:', access_token);
+      Cookies.set('token', access_token, { path: '/', expires: 7 }); // Set cookie for middleware
       await userAuthtenticate(access_token);
 
     } catch (error: any) {

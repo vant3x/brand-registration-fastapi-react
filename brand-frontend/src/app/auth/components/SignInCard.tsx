@@ -15,8 +15,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
-import { SitemarkIcon } from './CustomIcons';
-
+ 
 import authContext from "../../../context/auth/AuthContext";
 import { AuthContextType } from "../../../interfaces/AuthContextType";
 import axiosClient from "../../../config/axios";
@@ -77,7 +76,8 @@ export default function SignInCard() {
   return (
     <Card variant="outlined">
       <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-        <SitemarkIcon />
+    
+      
       </Box>
       <Typography
         component="h1"
@@ -156,6 +156,8 @@ export default function SignInCard() {
         <Button type="submit" fullWidth variant="contained">
           Iniciar Sesión
         </Button>
+        <Divider>o</Divider>
+
         <Typography sx={{ textAlign: 'center' }}>
           ¿No tienes una cuenta?{' '}
           <span>
@@ -169,7 +171,6 @@ export default function SignInCard() {
           </span>
         </Typography>
       </form>
-      <Divider>o</Divider>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         
       </Box>

@@ -7,7 +7,7 @@ import AutoFixHighRoundedIcon from '@mui/icons-material/AutoFixHighRounded';
 import ConstructionRoundedIcon from '@mui/icons-material/ConstructionRounded';
 import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
 import ThumbUpAltRoundedIcon from '@mui/icons-material/ThumbUpAltRounded';
-import { SitemarkIcon } from './CustomIcons';
+import Image from 'next/image';
 
 const items = [
   {
@@ -42,7 +42,13 @@ export default function Content() {
       sx={{ flexDirection: 'column', alignSelf: 'center', gap: 4, maxWidth: 450 }}
     >
       <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <SitemarkIcon />
+        <Image       src="/assets/image.webp"
+        width={220}
+        height={220}
+        alt="Logo" />
+       
+    
+    
       </Box>
       {items.map((item, index) => (
         <Stack key={index} direction="row" sx={{ gap: 2 }}>

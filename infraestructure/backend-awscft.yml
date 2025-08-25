@@ -1,0 +1,313 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template for a FastAPI application with PostgreSQL and S3 on EC2 using Docker.
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that is prefixed to resource names.
+    Type: String
+    Default: dev
+
+  VpcCidr:
+    Description: CIDR block for the VPC.
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnetCidr:
+    Description: CIDR block for the public subnet.
+    Type: String
+    Default: 10.0.0.0/24
+
+  EC2InstanceType:
+    Description: EC2 instance type for the FastAPI application.
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t3.micro
+      - t3.small
+      - t3.medium
+
+  EC2KeyPairName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance.
+    Type: AWS::EC2::KeyPair::KeyName
+
+  DBInstanceType:
+    Description: The database instance type.
+    Type: String
+    Default: db.t3.micro
+    AllowedValues:
+      - db.t2.micro
+      - db.t2.small
+      - db.t2.medium
+      - db.t3.micro
+      - db.t3.small
+      - db.t3.medium
+
+  DBAllocatedStorage:
+    Description: The size (in GiB) of the allocated storage for the DB instance.
+    Type: Number
+    Default: 20
+
+  DBUsername:
+    Description: Username for the PostgreSQL database.
+    Type: String
+    Default: admin
+
+  DBPassword:
+    Description: Password for the PostgreSQL database.
+    Type: String
+    NoEcho: true
+
+  FastAPIDockerImage:
+    Description: ECR URI of the FastAPI Docker image (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-fastapi-app:latest).
+    Type: String
+
+  S3BucketName:
+    Description: Name for the S3 bucket. Must be globally unique.
+    Type: String
+    Default: !Sub '${EnvironmentName}-fastapi-app-bucket-${AWS::AccountId}'
+
+  AppSecretKey:
+    Description: Secret key for the FastAPI application (e.g., for JWT).
+    Type: String
+    NoEcho: true
+
+  RedisURL:
+    Description: URL for the Redis instance (e.g., redis://your-redis-endpoint:6379).
+    Type: String
+    Default: redis://localhost:6379 # Placeholder, consider ElastiCache for production
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-VPC'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-InternetGateway'
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-PublicRouteTable'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnetCidr
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select [ 0, !GetAtt VPC.AvailabilityZones ]
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-PublicSubnet'
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  # Security Group for EC2 Instance
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${EnvironmentName}-EC2SecurityGroup'
+      GroupDescription: Enable SSH and HTTP/HTTPS access to EC2 instance
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0 # WARNING: For production, restrict this to known IPs
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8000 # FastAPI default port
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-EC2SecurityGroup'
+
+  # Security Group for RDS Instance
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${EnvironmentName}-RDSSecurityGroup'
+      GroupDescription: Allow access to RDS from EC2 instance
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432 # PostgreSQL default port
+          ToPort: 5432
+          SourceSecurityGroupId: !GetAtt EC2SecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-RDSSecurityGroup'
+
+  # S3 Bucket
+  FastAPIS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-FastAPIS3Bucket'
+
+  # IAM Role for EC2 to access S3
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${EnvironmentName}-EC2InstanceProfile'
+      Roles:
+        - !Ref EC2Role
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${EnvironmentName}-EC2Role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess # WARNING: For production, restrict to specific bucket
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly # For pulling Docker images from ECR
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-EC2Role'
+
+  # RDS PostgreSQL Instance
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub '${EnvironmentName}-fastapi-db'
+      DBInstanceClass: !Ref DBInstanceType
+      Engine: postgres
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      AllocatedStorage: !Ref DBAllocatedStorage
+      VPCSecurityGroups:
+        - !GetAtt RDSSecurityGroup.GroupId
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      PubliclyAccessible: false # Keep private for security
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-FastAPIDB'
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS instance
+      SubnetIds:
+        - !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-DBSubnetGroup'
+
+  # EC2 Instance for FastAPI
+  FastAPIEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-053b04d48d1000000 # Replace with a suitable Amazon Linux 2 AMI for your region
+      InstanceType: !Ref EC2InstanceType
+      KeyName: !Ref EC2KeyPairName
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          SubnetId: !Ref PublicSubnet
+          GroupSet:
+            - !GetAtt EC2SecurityGroup.GroupId
+          AssociatePublicIpAddress: true
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      UserData: !Base64 |
+        #!/bin/bash -xe
+        yum update -y
+        amazon-linux-extras install docker -y
+        service docker start
+        usermod -a -G docker ec2-user
+        chkconfig docker on
+
+        # Login to ECR
+        aws ecr get-login-password --region ${AWS::Region} | docker login --username AWS --password-stdin !Sub '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com'
+
+        # Pull and run Docker image
+        docker pull !Ref FastAPIDockerImage
+        docker run -d \
+          --name fastapi-app \
+          -p 80:8000 \
+          -e DATABASE_URL="postgresql+asyncpg://${DBUsername}:${DBPassword}@${RDSInstance.Endpoint.Address}:5432/postgres" \
+          -e SECRET_KEY="${AppSecretKey}" \
+          -e ALGORITHM="HS256" \
+          -e ACCESS_TOKEN_EXPIRE_MINUTES="30" \
+          -e REDIS_URL="${RedisURL}" \
+          -e AWS_S3_BUCKET_NAME="${S3BucketName}" \
+          -e AWS_REGION_NAME="${AWS::Region}" \
+          -e DEBUG="False" \
+          -e ENVIRONMENT="production" \
+          !Ref FastAPIDockerImage
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-FastAPIEC2Instance'
+
+Outputs:
+  VPCId:
+    Description: The ID of the created VPC.
+    Value: !Ref VPC
+  PublicSubnetId:
+    Description: The ID of the public subnet.
+    Value: !Ref PublicSubnet
+  EC2PublicIP:
+    Description: Public IP address of the EC2 instance.
+    Value: !GetAtt FastAPIEC2Instance.PublicIp
+  FastAPIS3BucketName:
+    Description: Name of the S3 bucket created for the FastAPI application.
+    Value: !Ref FastAPIS3Bucket
+  RDSEndpoint:
+    Description: Endpoint address of the RDS PostgreSQL instance.
+    Value: !GetAtt RDSInstance.Endpoint.Address
+  RDSReadEndpoint:
+    Description: Read endpoint address of the RDS PostgreSQL instance.
+    Value: !GetAtt RDSInstance.ReadEndpoint.Address
+  RDSPort:
+    Description: Port of the RDS PostgreSQL instance.
+    Value: !GetAtt RDSInstance.Endpoint.Port

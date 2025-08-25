@@ -33,12 +33,10 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
       setLoading(true);
       setError(null);
       try {
-        // Ensure token is available before making the request
         if (!token) {
           console.warn("No access token available in AuthContext. Attempting to re-authenticate.");
         }
 
-        // Set the Authorization header using the token from AuthContext
         const res = await axiosClient.get(`/brands/${brandId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +44,7 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
         });
         setBrand({
           ...res.data,
-          status: res.data.status.toUpperCase(), // Ensure status is uppercase
+          status: res.data.status.toUpperCase(), 
         });
       } catch (err: any) {
         console.error(`Error fetching brand with ID ${brandId}:`, err);
@@ -56,13 +54,13 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
       }
     };
 
-    if (brandId && token) { // Only fetch if brandId and token are available
+    if (brandId && token) { 
       fetchBrand();
-    } else if (!token && !loading) { // If no token and not loading, show error or redirect
+    } else if (!token && !loading) { 
         setError("No autenticado. Por favor, inicie sesión.");
         setLoading(false);
     }
-  }, [brandId, token, userAuthtenticate]); // Re-run when brandId or token changes
+  }, [brandId, token, userAuthtenticate]);
 
   if (loading) {
     return (
@@ -97,13 +95,11 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
       <Typography variant="h4" component="h1" gutterBottom>
         Editar Marca: {brand.marca} (ID: {brand.id})
       </Typography>
-      {/* Render the BrandRegistrationForm with initial data */}
       <BrandRegistrationForm
         initialData={brand}
         isEditMode={true}
         brandId={brandId}
         onSuccess={() => {
-          // Optionally re-fetch brand data or show a success message
           console.log('Marca actualizada exitosamente!');
         }}
       />
