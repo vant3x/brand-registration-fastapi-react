@@ -27,3 +27,10 @@ export const SET_CARS_SEARCHED = 'SET_CARS_SEARCHED';
 export const RESET_STATE = 'RESET_STATE';
 
 export const SET_CAR = 'SET_CAR';
+
+export const SHOW_LOADING = 'SHOW_LOADING';
+export const HIDE_LOADING = 'HIDE_LOADING';
+export const SET_ERROR = 'SET_ERROR';
+export const CLEAR_ERROR = 'CLEAR_ERROR';
+export const SHOW_SNACKBAR = 'SHOW_SNACKBAR';
+export const HIDE_SNACKBAR = 'HIDE_SNACKBAR';

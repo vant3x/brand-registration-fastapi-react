@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import ThemeRegistry from '../components/ThemeRegistry';
-import AuthState from './../context/auth/AuthState';
+import ClientProviders from '../components/layout/ClientProviders';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -40,11 +40,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeRegistry>
-          <AuthState>
-        
-             {children}
-        
-          </AuthState>
+          <ClientProviders>
+            {children}
+          </ClientProviders>
         </ThemeRegistry>
       </body>
     </html>

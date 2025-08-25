@@ -1,3 +1,6 @@
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import BrandList from '../../components/brands/BrandList';
 import axiosClient from '../../config/axios';
@@ -12,19 +15,30 @@ interface Brand {
   imagen_url?: string;
 }
 
-async function getBrands(): Promise<Brand[]> {
-  try {
-    const res = await axiosClient.get('/brands');
-    return res.data;
-  } catch (error) {
-    return [];
-  }
-}
+export default function BrandsListPage() {
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function BrandsListPage() {
-  const brands = await getBrands();
+  const fetchBrands = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axiosClient.get<Brand[]>('/brands');
+      setBrands(res.data);
+    } catch (err) {
+      console.error("Error fetching brands:", err);
+      setError("No se pudieron cargar las marcas o no hay marcas disponibles.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  if (!brands) {
+  useEffect(() => {
+    fetchBrands();
+  }, [fetchBrands]);
+
+  if (loading) {
     return (
       <MainLayout>
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -34,11 +48,11 @@ export default async function BrandsListPage() {
     );
   }
 
-  if (brands.length === 0) {
+  if (error) {
     return (
       <MainLayout>
         <Box sx={{ mt: 4 }}>
-          <Typography color="error">No se pudieron cargar las marcas o no hay marcas disponibles.</Typography>
+          <Typography color="error">{error}</Typography>
         </Box>
       </MainLayout>
     );
@@ -47,7 +61,7 @@ export default async function BrandsListPage() {
   return (
     <MainLayout>
       <h1>Listado de Marcas</h1>
-      <BrandList brands={brands} />
+      <BrandList brands={brands} onBrandDeleted={fetchBrands} />
     </MainLayout>
   );
 }

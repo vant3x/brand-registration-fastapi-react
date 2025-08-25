@@ -44,7 +44,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Typography>
           <Button color="inherit" component={Link} href="/">Inicio</Button>
           {auth ? (
-            <Button color="inherit" component={Link} href="/dashboard">Administrar</Button>
+            <>
+              <Button color="inherit" component={Link} href="/dashboard">Administrar</Button>
+              <Button color="inherit" onClick={AuthContext.logout}>Cerrar Sesión</Button>
+            </>
           ) : (
             <Button color="inherit" component={Link} href="/auth/login">Iniciar Sesión</Button>
           )}

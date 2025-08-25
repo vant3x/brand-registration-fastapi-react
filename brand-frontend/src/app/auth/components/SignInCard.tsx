@@ -1,6 +1,7 @@
 "use client";
 import React, { useContext, useEffect } from "react";
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
@@ -48,6 +49,13 @@ export default function SignInCard() {
 
   const AuthContext = useContext<AuthContextType>(authContext);
   const { message, auth, login, errorSession } = AuthContext;
+  const router = useRouter();
+
+  useEffect(() => {
+    if (auth) {
+      router.push('/');
+    }
+  }, [auth, router]);
 
   const [open, setOpen] = React.useState(false);
   

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -25,6 +26,10 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useRouter } from 'next/navigation'; // Import useRouter
+import { deleteBrand } from '../../services/brandService';
+import DeleteBrandDialog from './DeleteBrandDialog';
+import AppContext from '../../context/app/AppContext';
+import { AppContextType } from '../../interfaces/AppContextType';
 
 interface Brand {
   id: string;
@@ -61,7 +66,7 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Brand | 'acciones'; // Add 'acciones' as a possible ID
+  id: keyof Brand | 'acciones';
   label: string;
   numeric: boolean;
 }
@@ -224,15 +229,26 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
 interface BrandListProps {
   brands: Brand[];
+  onBrandDeleted: () => void;
 }
 
-const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands }) => {
+const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDeleted }) => {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Brand>('marca');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [brandToDeleteId, setBrandToDeleteId] = React.useState<string | null>(null);
+
+  const appCtx = React.useContext<AppContextType | undefined>(AppContext);
+
+  if (!appCtx) {
+    throw new Error("BrandList must be used within an AppProvider");
+  }
+
+  const { showSnackbar } = appCtx;
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -284,7 +300,6 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands }) => {
     setDense(event.target.checked);
   };
 
-  // Evitar un salto de diseño al llegar a la última página con filas vacías.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - initialBrands.length) : 0;
 
@@ -298,7 +313,6 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands }) => {
 
   const handleView = (id: string) => {
     console.log(`Ver marca con ID: ${id}`);
-    // Implement navigation to view brand details page
   };
 
   const router = useRouter();
@@ -306,10 +320,28 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands }) => {
     router.push(`/marcas/${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    console.log(`Eliminar marca con ID: ${id}`);
-    // Implement actual delete logic (e.g., API call, then update state)
+  const handleConfirmDelete = async (id: string) => {
+    try {
+      await deleteBrand(id);
+      console.log(`Marca con ID ${id} eliminada exitosamente.`);
+      showSnackbar(`Marca ${id} eliminada exitosamente.`, 'success');
+      setOpenDeleteDialog(false);
+      setBrandToDeleteId(null);
+      if (onBrandDeleted) {
+        onBrandDeleted();
+      }
+    } catch (error) {
+      console.error("Error al eliminar la marca:", error);
+      // TODO: Show an error message to the user
+    }
   };
+
+  const handleDelete = (id: string) => {
+    setBrandToDeleteId(id);
+    setOpenDeleteDialog(true);
+  };
+
+  
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -350,7 +382,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands }) => {
                         inputProps={{
                           'aria-labelledby': labelId,
                         }}
-                        onClick={(event) => handleClick(event, brand.id)} // Handle click on checkbox
+                        onClick={(event) => handleClick(event, brand.id)} 
                       />
                     </TableCell>
                     <TableCell
@@ -417,6 +449,13 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands }) => {
       <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Relleno denso"
+      />
+
+      <DeleteBrandDialog
+        open={openDeleteDialog}
+        brandId={brandToDeleteId}
+        onClose={() => setOpenDeleteDialog(false)}
+        onConfirmDelete={handleConfirmDelete}
       />
     </Box>
   );
