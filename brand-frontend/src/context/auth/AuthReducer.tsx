@@ -9,52 +9,84 @@ import {
     LOGOUT
 } from '../types';
 
-// Define the State type
-interface AuthState {
+export interface User {
+  full_name?: string;
+  email: string;
+  password?: string;
+}
+
+export interface ErrorSession {
+  error: boolean;
+  statusCode: number | null;
+  detail?: string;
+}
+
+export interface AuthState {
     token: string | null;
     auth: boolean | null;
-    user: any | null; // User type can be refined later
+    user: User | null;
     message: string | null;
-    errorSession: any | null; // Error session type can be refined later
+    errorSession: ErrorSession | null;
     signupStatus: number | null;
 }
 
-// Define Action types
 type AuthAction =
     | { type: typeof SIGNUP_SUCCESS; payload: { message: string; status: number } }
     | { type: typeof LOGIN_SUCCESS; payload: { token: string } }
-    | { type: typeof USER_AUTHENTICATE; payload: any } // User payload type can be refined
+    | { type: typeof USER_AUTHENTICATE; payload: User }
     | { type: typeof LOGOUT }
-    | { type: typeof LOGIN_ERROR; payload: any } // Error payload type can be refined
-    | { type: typeof SESSION_ERROR; payload: any } // Error payload type can be refined
-    | { type: typeof SIGNUP_ERROR; payload: any } // Error payload type can be refined
+    | { type: typeof LOGIN_ERROR; payload: string | null }
+    | { type: typeof SESSION_ERROR; payload: string | null }
+    | { type: typeof SIGNUP_ERROR; payload: string | null }
     | { type: typeof REMOVE_ALERTS };
 
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     switch (action.type) {
         case SIGNUP_SUCCESS:
+            // Type assertion para indicar que sabemos que payload no es null
+            const signupPayload = action.payload as { message: string; status: number };
             return {
                 ...state,
-                message: action.payload.message,
-                signupStatus: action.payload.status
+                message: signupPayload.message,
+                signupStatus: signupPayload.status
             };
         case LOGIN_SUCCESS:
+            // Type assertion para el token
+            const loginPayload = action.payload as { token: string };
             return {
                 ...state,
-                token: action.payload.token,
+                token: loginPayload.token,
                 auth: true,
                 message: null,
                 errorSession: null
             };
         case USER_AUTHENTICATE:
+            // Type assertion para el usuario
+            const userPayload = action.payload as User;
             return {
                 ...state,
-                user: action.payload,
+                user: userPayload,
                 auth: true
             };
         case LOGOUT:
+            return {
+                ...state,
+                token: null,
+                user: null,
+                auth: null,
+                message: null,
+                errorSession: null
+            };
         case LOGIN_ERROR:
+            return {
+                ...state,
+                token: null,
+                user: null,
+                auth: null,
+                message: action.payload,
+                errorSession: null
+            };
         case SESSION_ERROR:
             return {
                 ...state,
@@ -62,12 +94,13 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
                 user: null,
                 auth: null,
                 message: action.payload,
-                errorSession: action.payload
+                errorSession: null
             };
         case SIGNUP_ERROR:
+            const signupErrorPayload = action.payload as string | null;
             return {
                 ...state,
-                message: action.payload
+                message: signupErrorPayload
             };
         case REMOVE_ALERTS:
             return {

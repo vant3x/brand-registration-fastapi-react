@@ -9,17 +9,7 @@ import { useRouter } from 'next/navigation';
 
 import axiosInstance from '../../config/axios';
 import AuthContext from '../../context/auth/AuthContext';
-
-interface Brand {
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url: string;
-  id: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Brand } from '../../services/brandService';
 
 interface BrandItemProps {
   brand: Brand;
@@ -44,7 +34,7 @@ const BrandItem: React.FC<BrandItemProps> = ({ brand, onViewDetails }) => {
       try {
         const response = await axiosInstance.get(`/brands/${brand.id}/image/presigned-url`);
         setPresignedImageUrl(response.data);
-      } catch (err) {
+      } catch {
         setError("Error al cargar la imagen.");
       } finally {
         setLoading(false);
@@ -65,7 +55,7 @@ const BrandItem: React.FC<BrandItemProps> = ({ brand, onViewDetails }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: 'primary.light', // Example background color
+            bgcolor: 'primary.light',
             color: 'primary.contrastText',
             fontSize: '3rem',
             fontWeight: 'bold',

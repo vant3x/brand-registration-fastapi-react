@@ -13,3 +13,13 @@ export interface AppContextType {
   showSnackbar: (message: string, type: 'success' | 'error' | 'info' | 'warning') => void;
   hideSnackbar: () => void;
 }
+
+export interface AppState {
+  loading: boolean;
+  error: string | null;
+  snackbar: {
+    open: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info' | 'warning';
+  };
+}

@@ -1,6 +1,6 @@
 import axiosClient from './axios';
 
-const authToken = (token: string): void => {
+const authToken = (token: string | null): void => {
     if (token) {
         axiosClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {

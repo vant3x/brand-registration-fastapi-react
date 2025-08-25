@@ -37,7 +37,6 @@ interface SignupFormValues {
   // Assuming signup has at least email and password, add other fields as needed
   email: string;
   password: string;
-  [key: string]: any; // Allow other properties for now if not fully defined
 }
 
 // Define interface for Axios error response
@@ -66,7 +65,7 @@ const AuthState = ({ children }: Props) => {
     throw new Error("AuthState must be used within an AppProvider");
   }
 
-  const { showSnackbar } = appCtx; // Get showSnackbar from AppContext
+  const { showSnackbar } = appCtx; 
 
   const logout = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -95,10 +94,11 @@ const AuthState = ({ children }: Props) => {
           payload: response.data,
         });
       }
-    } catch (error: AxiosErrorResponse) { // Typed error
+    } catch (error: unknown) {
+      const axiosError = error as AxiosErrorResponse;
       dispatch({
         type: SESSION_ERROR,
-        payload: error?.response?.data?.detail,
+        payload: axiosError?.response?.data?.detail || null,
       });
       logout();
     }
@@ -115,12 +115,13 @@ const AuthState = ({ children }: Props) => {
         }
       });
       showSnackbar("Usuario creado correctamente", "success"); // Show success snackbar
-    } catch (error: AxiosErrorResponse) { // Typed error
+    } catch (error: unknown) {
+      const axiosError = error as AxiosErrorResponse;
       dispatch({
         type: SIGNUP_ERROR,
-        payload: error.response?.data?.detail, // Added optional chaining
+        payload: axiosError.response?.data?.detail || null, // Added || null
       });
-      showSnackbar(error.response?.data?.detail || "Error al crear usuario", "error"); // Show error snackbar, added optional chaining
+      showSnackbar(axiosError.response?.data?.detail || "Error al crear usuario", "error"); // Show error snackbar, added optional chaining
     }
     setTimeout(() => {
       dispatch({
@@ -148,12 +149,13 @@ const AuthState = ({ children }: Props) => {
       await userAuthtenticate(access_token);
       showSnackbar("Inicio de sesión exitoso", "success"); // Show success snackbar
 
-    } catch (error: AxiosErrorResponse) { // Typed error
+    } catch (error: unknown) {
+      const axiosError = error as AxiosErrorResponse;
       dispatch({
         type: LOGIN_ERROR,
-        payload: error.response?.data?.detail,
+        payload: axiosError.response?.data?.detail || null, // Added || null
       });
-      showSnackbar(error.response?.data?.detail || "Credenciales incorrectas", "error"); // Show error snackbar
+      showSnackbar(axiosError.response?.data?.detail || "Credenciales incorrectas", "error"); // Show error snackbar
     }
     // Removed setTimeout for REMOVE_ALERTS as snackbar handles auto-hide
   };

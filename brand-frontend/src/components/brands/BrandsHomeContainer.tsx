@@ -1,20 +1,11 @@
+
 'use client';
-
-import React from 'react';
-import { Typography, Box, Grid } from '@mui/material';
-import BrandItem from './BrandItem'; // Import the BrandItem component
-import BrandDetailModal from './BrandDetailModal'; // Import the BrandDetailModal component
-
-interface Brand {
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url: string;
-  id: string;
-  created_at: string;
-  updated_at: string;
-}
+import * as React from 'react';
+import { Typography, Box } from '@mui/material';
+import { GridLegacy as Grid } from '@mui/material';
+import BrandItem from './BrandItem';
+import BrandDetailModal from './BrandDetailModal'; 
+import { Brand } from '../../services/brandService';
 
 interface BrandsHomeContainerProps {
   brands: Brand[];

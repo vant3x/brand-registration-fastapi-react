@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import axiosClient from "../config/axios";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axiosClient from "@/config/axios";
 
 const useAuthChecker = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [error, setError] = useState<null | string>(null);
   const router = useRouter();
 
@@ -30,7 +29,7 @@ const useAuthChecker = () => {
     return () => {
       axiosClient.interceptors.response.eject(requestInterceptor);
     };
-  }, []);
+  }, [router]);
 
   return error;
 };

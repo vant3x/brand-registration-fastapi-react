@@ -3,53 +3,33 @@
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { visuallyHidden } from '@mui/utils';
-import { useRouter } from 'next/navigation'; // Import useRouter
-import { deleteBrand } from '../../services/brandService';
+import { useRouter } from 'next/navigation';
+import { deleteBrand, Brand } from '../../services/brandService';
 import DeleteBrandDialog from './DeleteBrandDialog';
-import BrandDetailModal from './BrandDetailModal'; // Import the new modal component
+import BrandDetailModal from './BrandDetailModal';
 import BrandTableRow from './BrandTableRow';
 import BrandTableHead from './BrandTableHead';
 import AppContext from '../../context/app/AppContext';
 import { AppContextType } from '../../interfaces/AppContextType';
 
-interface Brand {
-  id: string;
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
+function descendingComparator(a: Brand, b: Brand, orderBy: keyof Brand) {
+  if (b[orderBy]! < a[orderBy]!) {
     return -1;
   }
-  if (b[orderBy] > a[orderBy]) {
+  if (b[orderBy]! > a[orderBy]!) {
     return 1;
   }
   return 0;
@@ -57,19 +37,57 @@ function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 
 type Order = 'asc' | 'desc';
 
-function getComparator<Key extends keyof any>(
+function getComparator(
   order: Order,
-  orderBy: Key,
+  orderBy: keyof Brand,
 ): (
-  a: { [key in Key]: any },
-  b: { [key in Key]: any },
+  a: Brand,
+  b: Brand,
 ) => number {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
+interface HeadCell {
+  disablePadding: boolean;
+  id: keyof Brand;
+  label: string;
+  numeric: boolean;
+}
 
+const headCells: readonly HeadCell[] = [
+  {
+    id: 'id',
+    numeric: false,
+    disablePadding: true,
+    label: 'ID',
+  },
+  {
+    id: 'marca',
+    numeric: false,
+    disablePadding: false,
+    label: 'Nombre',
+  },
+  {
+    id: 'titular',
+    numeric: false,
+    disablePadding: false,
+    label: 'Propietario',
+  },
+  {
+    id: 'status',
+    numeric: false,
+    disablePadding: false,
+    label: 'Status',
+  },
+  {
+    id: 'pais_registro',
+    numeric: false,
+    disablePadding: false,
+    label: 'País de Registro',
+  },
+];
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
@@ -80,16 +98,14 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
   return (
     <Toolbar
-      sx={[
-        {
-          pl: { sm: 2 },
-          pr: { xs: 1, sm: 1 },
-        },
-        numSelected > 0 && {
+      sx={{
+        pl: { sm: 2 },
+        pr: { xs: 1, sm: 1 },
+        ...(numSelected > 0 && {
           bgcolor: (theme) =>
             alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
-        },
-      ]}
+        }),
+      }}
     >
       {numSelected > 0 ? (
         <Typography
@@ -98,7 +114,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           variant="subtitle1"
           component="div"
         >
-          {numSelected} seleccionadas
+          {numSelected} selected
         </Typography>
       ) : (
         <Typography
@@ -107,17 +123,17 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           id="tableTitle"
           component="div"
         >
-          Listado de Marcas
+          Brands
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title="Eliminar seleccionadas">
+        <Tooltip title="Delete">
           <IconButton>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filtrar lista">
+        <Tooltip title="Filter list">
           <IconButton>
             <FilterListIcon />
           </IconButton>
@@ -132,25 +148,17 @@ interface BrandListProps {
   onBrandDeleted: () => void;
 }
 
-const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDeleted }) => {
+const BrandList: React.FC<BrandListProps> = ({ brands, onBrandDeleted }) => {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Brand>('marca');
+  const [orderBy, setOrderBy] = React.useState<keyof Brand>('id');
   const [selected, setSelected] = React.useState<readonly string[]>([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
   const [brandToDeleteId, setBrandToDeleteId] = React.useState<string | null>(null);
-  const [openBrandDetailModal, setOpenBrandDetailModal] = React.useState(false); // New state for modal
-  const [selectedBrandForModal, setSelectedBrandForModal] = React.useState<Brand | null>(null); // New state for selected brand
-
-  const appCtx = React.useContext<AppContextType | undefined>(AppContext);
-
-  if (!appCtx) {
-    throw new Error("BrandList must be used within an AppProvider");
-  }
-
-  const { showSnackbar } = appCtx;
+  const [openBrandDetailModal, setOpenBrandDetailModal] = React.useState(false);
+  const [selectedBrandForModal, setSelectedBrandForModal] = React.useState<Brand | null>(null);
+  const { showSnackbar } = React.useContext(AppContext as React.Context<AppContextType>);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -163,7 +171,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = initialBrands.map((n) => n.id);
+      const newSelected = brands.map((n) => n.id);
       setSelected(newSelected);
       return;
     }
@@ -198,23 +206,19 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
     setPage(0);
   };
 
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
-  };
-
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - initialBrands.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - brands.length) : 0;
 
   const visibleRows = React.useMemo(
     () =>
-      [...initialBrands]
+      [...brands]
         .sort(getComparator(order, orderBy))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, initialBrands],
+    [order, orderBy, page, rowsPerPage, brands],
   );
 
   const handleView = (id: string) => {
-    const brand = initialBrands.find(b => b.id === id);
+    const brand = brands.find(b => b.id === id);
     if (brand) {
       setSelectedBrandForModal(brand);
       setOpenBrandDetailModal(true);
@@ -243,7 +247,6 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
       }
     } catch (error) {
       console.error("Error al eliminar la marca:", error);
-      // TODO: Show an error message to the user
     }
   };
 
@@ -260,7 +263,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
+            
           >
             <BrandTableHead
               numSelected={selected.length}
@@ -268,7 +271,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={initialBrands.length}
+              rowCount={brands.length}
             />
             <TableBody>
               {visibleRows.map((brand, index) => {
@@ -290,9 +293,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
               })}
               {emptyRows > 0 && (
                 <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
+                  style={{}}
                 >
                   <TableCell colSpan={headCells.length + 1} />
                 </TableRow>
@@ -303,7 +304,7 @@ const BrandList: React.FC<BrandListProps> = ({ brands: initialBrands, onBrandDel
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={initialBrands.length}
+          count={brands.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

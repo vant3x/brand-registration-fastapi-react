@@ -7,7 +7,7 @@ import {
   HIDE_SNACKBAR,
 } from '../../context/types';
 
-import { AppContextType } from '../../interfaces/AppContextType';
+import { AppState } from '../../interfaces/AppContextType';
 
 type Action =
   | { type: typeof SHOW_LOADING }
@@ -17,7 +17,7 @@ type Action =
   | { type: typeof SHOW_SNACKBAR; payload: { message: string; type: 'success' | 'error' | 'info' | 'warning' } }
   | { type: typeof HIDE_SNACKBAR };
 
-export const appReducer = (state: AppContextType, action: Action) => {
+export const appReducer = (state: AppState, action: Action) => {
   switch (action.type) {
     case SHOW_LOADING:
       return {

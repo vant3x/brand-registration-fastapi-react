@@ -5,16 +5,9 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 import axiosClient from '../../config/axios';
 import authContext from "../../context/auth/AuthContext";
 import { AuthContextType } from "../../interfaces/AuthContextType";
-import BrandRegistrationForm from '../forms/BrandRegistrationForm'; // Import the form
-
-interface Brand {
-  id: string;
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url?: string;
-}
+import BrandRegistrationForm from '../forms/BrandRegistrationForm';
+import { AxiosError } from 'axios';
+import { Brand } from '../../services/brandService';
 
 interface BrandDetailsClientProps {
   brandId: string;
@@ -26,7 +19,7 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
   const [error, setError] = useState<string | null>(null);
 
   const AuthContext = useContext<AuthContextType>(authContext);
-  const { token, userAuthtenticate } = AuthContext; // Get token from AuthContext
+  const { token, userAuthtenticate } = AuthContext;
 
   useEffect(() => {
     const fetchBrand = async () => {
@@ -46,9 +39,10 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
           ...res.data,
           status: res.data.status.toUpperCase(), 
         });
-      } catch (err: any) {
+      } catch (err) {
         console.error(`Error fetching brand with ID ${brandId}:`, err);
-        setError(err.response?.data?.detail || 'Error al cargar la marca.');
+        const axiosError = err as AxiosError<{ detail: string }>;
+        setError(axiosError.response?.data?.detail || 'Error al cargar la marca.');
       } finally {
         setLoading(false);
       }
@@ -56,7 +50,7 @@ const BrandDetailsClient: React.FC<BrandDetailsClientProps> = ({ brandId }) => {
 
     if (brandId && token) { 
       fetchBrand();
-    } else if (!token && !loading) { 
+    } else if (!token) {
         setError("No autenticado. Por favor, inicie sesión.");
         setLoading(false);
     }

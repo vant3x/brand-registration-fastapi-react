@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -8,12 +8,13 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import axiosClient from '../../config/axios'; 
 import { useRouter } from 'next/navigation';
 import CircularProgress from '@mui/material/CircularProgress';
+import { AxiosError } from "axios";
 
 
 interface BrandFormData {
@@ -43,7 +44,7 @@ export default function BrandStepperForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | { name?: string; value: unknown }>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -57,7 +58,7 @@ export default function BrandStepperForm() {
     setSuccess(null);
 
     try {
-      const response = await axiosClient.post('/brands/', formData);
+      await axiosClient.post('/brands/', formData);
       setSuccess('Marca registrada exitosamente!');
       setFormData({
         marca: '',
@@ -67,14 +68,14 @@ export default function BrandStepperForm() {
         imagen_url: '',
       }); 
       router.push('/marcas'); 
-    } catch (err: any) {
+    } catch (err) {
+      const axiosError = err as AxiosError<{ detail: string }>;
       console.error('Error registering brand:', err);
-      setError(err.response?.data?.detail || 'Error al registrar la marca.');
+      setError(axiosError.response?.data?.detail || 'Error al registrar la marca.');
     } finally {
       setLoading(false);
     }
   };
-
 
   const totalSteps = () => {
     return steps.length;
@@ -268,3 +269,4 @@ export default function BrandStepperForm() {
       </div>
     </Box>
   );
+}

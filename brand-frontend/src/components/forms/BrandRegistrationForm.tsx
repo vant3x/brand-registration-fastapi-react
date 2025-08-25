@@ -12,8 +12,9 @@ import {
     InputLabel,
     FormControl,
 } from '@mui/material';
-import axiosClient from '../../config/axios'; // Import the configured axios instance
+import axiosClient from '../../config/axios';
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
 
 interface BrandFormData {
     marca: string;
@@ -24,10 +25,10 @@ interface BrandFormData {
 }
 
 interface BrandRegistrationFormProps {
-    initialData?: BrandFormData; // Data to pre-populate for editing
-    onSuccess?: () => void; // Callback after successful submission
-    isEditMode?: boolean; // Flag to indicate edit mode
-    brandId?: string; // Required for edit mode
+    initialData?: BrandFormData;
+    onSuccess?: () => void; 
+    isEditMode?: boolean;
+    brandId?: string; 
 }
 
 const BrandRegistrationForm: React.FC<BrandRegistrationFormProps> = ({
@@ -39,7 +40,7 @@ const BrandRegistrationForm: React.FC<BrandRegistrationFormProps> = ({
     const router = useRouter();
     const [formData, setFormData] = useState<BrandFormData>(initialData ? {
         ...initialData,
-        imagen_url: initialData.imagen_url || '', // Ensure imagen_url is always a string
+        imagen_url: initialData.imagen_url || '', 
     } : {
         marca: '',
         titular: '',
@@ -76,15 +77,14 @@ const BrandRegistrationForm: React.FC<BrandRegistrationFormProps> = ({
         setSuccess(null);
 
         try {
-            let response;
             if (isEditMode) {
                 if (!brandId) {
                     throw new Error("Brand ID is required for edit mode.");
                 }
-                response = await axiosClient.put(`/brands/${brandId}`, formData);
+                await axiosClient.put(`/brands/${brandId}`, formData);
                 setSuccess('Marca actualizada exitosamente!');
             } else {
-                response = await axiosClient.post('/brands/', formData);
+                await axiosClient.post('/brands/', formData); 
                 setSuccess('Marca registrada exitosamente!');
             }
 
@@ -95,17 +95,18 @@ const BrandRegistrationForm: React.FC<BrandRegistrationFormProps> = ({
                     status: '',
                     pais_registro: '',
                     imagen_url: '',
-                }); // Clear form only for new registration
+                });
             }
 
             if (onSuccess) {
                 onSuccess();
-            } else if (!isEditMode) { // Only redirect for new registration if no onSuccess callback
+            } else if (!isEditMode) { 
                 router.push('/marcas');
             }
-        } catch (err: any) {
+        } catch (err) { 
+            const axiosError = err as AxiosError<{ detail: string }>;
             console.error(isEditMode ? 'Error updating brand:' : 'Error registering brand:', err);
-            setError(err.response?.data?.detail || (isEditMode ? 'Error al actualizar la marca.' : 'Error al registrar la marca.'));
+            setError(axiosError.response?.data?.detail || (isEditMode ? 'Error al actualizar la marca.' : 'Error al registrar la marca.'));
         } finally {
             setLoading(false);
         }

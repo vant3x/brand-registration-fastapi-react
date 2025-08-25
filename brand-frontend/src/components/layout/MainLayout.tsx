@@ -11,6 +11,10 @@ import { AuthContextType } from "../../interfaces/AuthContextType";
 
 const drawerWidth = 240;
 
+interface MainLayoutProps {
+  children: React.ReactNode;
+}
+
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const AuthContext = useContext<AuthContextType>(authContext);

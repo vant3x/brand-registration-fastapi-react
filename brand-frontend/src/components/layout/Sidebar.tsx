@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography, Divider, Box } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Divider, Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import Link from 'next/link';
 import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark'; 
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'; 

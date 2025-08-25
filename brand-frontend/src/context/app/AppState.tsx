@@ -1,5 +1,6 @@
 'use client';
 import React, { useReducer, useCallback } from 'react';
+import type { AppState } from '../../interfaces/AppContextType';
 import AppContext from './AppContext';
 import { appReducer } from './AppReducer';
 import {
@@ -16,7 +17,7 @@ interface AppStateProps {
 }
 
 const AppState: React.FC<AppStateProps> = ({ children }) => {
-  const initialState = {
+  const initialState: AppState = {
     loading: false,
     error: null,
     snackbar: {

@@ -6,17 +6,7 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { visuallyHidden } from '@mui/utils';
-
-interface Brand {
-  id: string;
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { Brand } from '../../services/brandService';
 
 type Order = 'asc' | 'desc';
 
@@ -29,34 +19,34 @@ interface HeadCell {
 
 const headCells: readonly HeadCell[] = [
   {
-    id: 'marca',
+    id: 'id',
     numeric: false,
     disablePadding: true,
-    label: 'Marca',
+    label: 'ID',
+  },
+  {
+    id: 'marca',
+    numeric: false,
+    disablePadding: false,
+    label: 'Nombre',
   },
   {
     id: 'titular',
     numeric: false,
     disablePadding: false,
-    label: 'Titular',
+    label: 'Propietario',
   },
   {
     id: 'status',
     numeric: false,
     disablePadding: false,
-    label: 'Estado',
+    label: 'Status',
   },
   {
     id: 'pais_registro',
     numeric: false,
     disablePadding: false,
     label: 'País de Registro',
-  },
-  {
-    id: 'imagen_url',
-    numeric: false,
-    disablePadding: false,
-    label: 'Imagen',
   },
   {
     id: 'acciones',

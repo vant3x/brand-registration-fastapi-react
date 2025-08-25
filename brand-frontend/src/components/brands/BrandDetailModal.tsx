@@ -15,17 +15,7 @@ import {
 } from '@mui/material';
 import axiosInstance from '../../config/axios';
 import AuthContext from '../../context/auth/AuthContext';
-
-interface Brand {
-  id: string;
-  marca: string;
-  titular: string;
-  status: string;
-  pais_registro: string;
-  imagen_url?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { Brand } from '../../services/brandService';
 
 interface BrandDetailModalProps {
   open: boolean;

@@ -18,7 +18,6 @@ import ForgotPassword from './ForgotPassword';
  
 import authContext from "../../../context/auth/AuthContext";
 import { AuthContextType } from "../../../interfaces/AuthContextType";
-import axiosClient from "../../../config/axios";
 
 interface IFormInput {
   email: string;
@@ -47,7 +46,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 export default function SignInCard() {
 
   const AuthContext = useContext<AuthContextType>(authContext);
-  const { message, auth, login, errorSession } = AuthContext;
+  const { auth, login } = AuthContext;
   const router = useRouter();
 
   useEffect(() => {

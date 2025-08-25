@@ -73,12 +73,6 @@ Parameters:
     Description: Secret key for the FastAPI application (e.g., for JWT).
     Type: String
     NoEcho: true
-
-  RedisURL:
-    Description: URL for the Redis instance (e.g., redis://your-redis-endpoint:6379).
-    Type: String
-    Default: redis://localhost:6379 # Placeholder, consider ElastiCache for production
-
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -230,7 +224,7 @@ Resources:
       VPCSecurityGroups:
         - !GetAtt RDSSecurityGroup.GroupId
       DBSubnetGroupName: !Ref DBSubnetGroup
-      PubliclyAccessible: false # Keep private for security
+      PubliclyAccessible: false 
       Tags:
         - Key: Name
           Value: !Sub '${EnvironmentName}-FastAPIDB'

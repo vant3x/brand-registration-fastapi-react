@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../../components/layout/MainLayout';
 import BrandList from '../../components/brands/BrandList';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { getBrands, Brand } from '../../services/brandService'; // Import getBrands and Brand interface
+import { getBrands, Brand } from '../../services/brandService';
 
 export default function BrandsListPage() {
   const [brands, setBrands] = useState<Brand[]>([]);

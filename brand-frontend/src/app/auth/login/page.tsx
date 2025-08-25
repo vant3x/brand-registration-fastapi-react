@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import SignInCard from '../components/SignInCard';
 import Content from '../components/Content';
 
-export default function LoginPage(props: { disableCustomTheme?: boolean }) {
+export default function LoginPage() {
   return (
     <>
       <CssBaseline enableColorScheme />

@@ -7,6 +7,8 @@ export interface Brand {
   status: string;
   pais_registro: string;
   imagen_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const getBrands = async (): Promise<Brand[]> => {
