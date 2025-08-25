@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, CardContent, CardMedia, Typography, Box, CardActions, Button } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import { useRouter } from 'next/navigation';
 
 import axiosInstance from '../../config/axios';
@@ -55,13 +58,31 @@ const BrandItem: React.FC<BrandItemProps> = ({ brand, onViewDetails }) => {
 
   return (
     <Card sx={{ maxWidth: 345, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <CardMedia
-        component="img"
-        height="140"
-        image={imageUrlToDisplay}
-        alt={brand.marca}
-        sx={{ objectFit: 'contain', p: 1 }}
-      />
+      {imageUrlToDisplay && imageUrlToDisplay.startsWith('https://via.placeholder.com') ? (
+        <Box
+          sx={{
+            height: 140,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'primary.light', // Example background color
+            color: 'primary.contrastText',
+            fontSize: '3rem',
+            fontWeight: 'bold',
+            p: 1,
+          }}
+        >
+          {brand.marca ? brand.marca.charAt(0).toUpperCase() : 'N/A'}
+        </Box>
+      ) : (
+        <CardMedia
+          component="img"
+          height="140"
+          image={imageUrlToDisplay}
+          alt={brand.marca}
+          sx={{ objectFit: 'contain', p: 1 }}
+        />
+      )}
       {loading && <Typography variant="body2" color="text.secondary">Cargando imagen...</Typography>}
       {error && <Typography variant="body2" color="error">{error}</Typography>}
       <CardContent sx={{ flexGrow: 1 }}>
@@ -80,8 +101,8 @@ const BrandItem: React.FC<BrandItemProps> = ({ brand, onViewDetails }) => {
       </CardContent>
       <CardActions>
         <Button size="small" onClick={() => onViewDetails(brand)}>Ver Detalles</Button>
-        <Button size="small" onClick={() => router.push('/marcas/editar/'+brand.id)}>Editar</Button>
-        <Button size="small" onClick={() => onViewDetails(brand)}>Eliminar</Button>
+        <Button size="small" onClick={() => router.push('/marcas/editar/'+brand.id)}><EditIcon/> Editar</Button>
+        <Button size="small" onClick={() => onViewDetails(brand)}><DeleteIcon/> Eliminar</Button>
       </CardActions>
     </Card>
   );
