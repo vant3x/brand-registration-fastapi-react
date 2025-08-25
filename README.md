@@ -1,2 +1,2 @@
 
-![Diagrama de Arquitectura](archi.png)
+![Diagrama de Arquitectura](./brand-api/archi.png)
