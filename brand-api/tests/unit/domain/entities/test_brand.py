@@ -1,12 +1,9 @@
 from app.domain.entities.brand import Brand
 from app.shared.enums.brand_status import BrandStatus
 
+
 def test_create_brand_entity():
-    brand = Brand(
-        marca="Test Brand",
-        titular="Test Owner",
-        status=BrandStatus.ACTIVO
-    )
+    brand = Brand(marca="Test Brand", titular="Test Owner", status=BrandStatus.ACTIVO)
 
     assert brand.marca == "Test Brand"
     assert brand.titular == "Test Owner"
@@ -17,6 +14,7 @@ def test_create_brand_entity():
     assert brand.created_at is None
     assert brand.updated_at is None
 
+
 def test_create_brand_entity_with_optional_fields():
     brand = Brand(
         id=1,
@@ -24,7 +22,7 @@ def test_create_brand_entity_with_optional_fields():
         titular="Another Owner",
         status=BrandStatus.INACTIVO,
         pais_registro="Colombia",
-        imagen_url="http://example.com/image.png"
+        imagen_url="http://example.com/image.png",
     )
 
     assert brand.id == 1

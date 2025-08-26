@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class BrandStatus(str, Enum):
     ACTIVO = "activo"
     INACTIVO = "inactivo"

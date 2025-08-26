@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class S3Service:
     def __init__(self):
         if (
@@ -29,7 +30,9 @@ class S3Service:
         else:
             self.s3_client = None
             self.bucket_name = None
-            logger.warning("S3Service not initialized: Missing AWS credentials or bucket name in settings.")
+            logger.warning(
+                "S3Service not initialized: Missing AWS credentials or bucket name in settings."
+            )
 
     def upload_file(
         self, file_content: bytes, object_name: str, content_type: str
@@ -60,9 +63,9 @@ class S3Service:
             raise RuntimeError("S3 service is not configured.")
         try:
             response = self.s3_client.generate_presigned_url(
-                'get_object',
-                Params={'Bucket': self.bucket_name, 'Key': object_name},
-                ExpiresIn=expiration
+                "get_object",
+                Params={"Bucket": self.bucket_name, "Key": object_name},
+                ExpiresIn=expiration,
             )
         except ClientError as e:
             logger.error(f"Error generating presigned URL: {e}")

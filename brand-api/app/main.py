@@ -1,17 +1,15 @@
 from fastapi import FastAPI
-from starlette.middleware.base import BaseHTTPMiddleware
-from app.core.middleware import logging_and_timing_middleware
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.core.config import get_settings
-from app.core.exceptions import setup_exception_handlers
-from app.presentation.api.v1.router import api_router
-
-from app.core.limiter import limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.core.config import get_settings
+from app.core.exceptions import setup_exception_handlers
+from app.core.limiter import limiter
+from app.core.middleware import logging_and_timing_middleware
+from app.presentation.api.v1.router import api_router
 
 settings = get_settings()
 app = FastAPI(title=settings.project_name, version="1.0.0", debug=settings.debug)

@@ -13,7 +13,7 @@ class Brand:
     status: BrandStatus
 
     id: Optional[UUID] = None
-    pais_registro: Optional[str] = 'Colombia'
+    pais_registro: Optional[str] = "Colombia"
     imagen_url: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

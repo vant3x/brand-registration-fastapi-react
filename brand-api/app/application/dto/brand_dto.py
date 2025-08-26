@@ -9,7 +9,7 @@ class CreateBrandDTO:
     marca: str
     titular: str
     status: BrandStatus
-    pais_registro: Optional[str] = 'Colombia'
+    pais_registro: Optional[str] = "Colombia"
     imagen_url: Optional[str] = None
 
 
@@ -22,4 +22,3 @@ class UpdateBrandDTO:
     imagen_url: Optional[str] = None
     imagen_file_content: Optional[bytes] = None
     imagen_file_name: Optional[str] = None
-

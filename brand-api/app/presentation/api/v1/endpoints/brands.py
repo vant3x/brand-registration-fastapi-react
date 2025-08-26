@@ -1,23 +1,21 @@
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status, File, UploadFile, Body, Form
-
-from app.presentation.api.dependencies.s3 import get_s3_service
+from fastapi import APIRouter, Body, Depends, File, Form, UploadFile, status
 
 from app.application.dto.brand_dto import CreateBrandDTO, UpdateBrandDTO
 from app.application.use_cases.brand.create_brand import CreateBrandUseCase
 from app.application.use_cases.brand.delete_brand import DeleteBrandUseCase
 from app.application.use_cases.brand.get_brand import GetBrandUseCase
+from app.application.use_cases.brand.get_presigned_url import GetPresignedUrlUseCase
 from app.application.use_cases.brand.update_brand import UpdateBrandUseCase
 from app.application.use_cases.brand.upload_brand_image import UploadBrandImageUseCase
-from app.application.use_cases.brand.get_presigned_url import GetPresignedUrlUseCase
+from app.domain.entities.user import User
 from app.presentation.api.dependencies.database import get_brand_repository
+from app.presentation.api.dependencies.s3 import get_s3_service
+from app.presentation.api.dependencies.security import get_current_user
 from app.presentation.schemas.brand import BrandCreate, BrandResponse, BrandUpdate
 from app.shared.enums.brand_status import BrandStatus
-from app.domain.entities.user import User
-from app.presentation.api.dependencies.security import get_current_user
-
 
 router = APIRouter(tags=["brands"])
 
@@ -62,7 +60,7 @@ async def get_brand_image_presigned_url(
     brand_id: UUID,
     brand_repo=Depends(get_brand_repository),
     s3_service=Depends(get_s3_service),
-    #current_user: User = Depends(get_current_user),
+    # current_user: User = Depends(get_current_user),
 ):
     use_case = GetPresignedUrlUseCase(brand_repo, s3_service)
     presigned_url = await use_case.execute(brand_id)
@@ -132,5 +130,3 @@ async def delete_brand(
     use_case = DeleteBrandUseCase(brand_repo)
     await use_case.execute(brand_id)
     return
-
-  

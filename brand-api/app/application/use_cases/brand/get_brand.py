@@ -1,5 +1,3 @@
-
-
 from app.core.exceptions import (  # Assuming you'll create this exception
     BrandNotFoundError,
 )

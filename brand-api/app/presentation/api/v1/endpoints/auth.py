@@ -5,8 +5,8 @@ from app.application.use_cases.auth.login_user import LoginUseCase
 from app.application.use_cases.auth.refresh_token import RefreshTokenUseCase
 from app.presentation.api.dependencies.database import get_user_repository
 from app.presentation.schemas.user import (
-    Token,
     RefreshTokenRequest,
+    Token,
     TokenRefreshResponse,
     UserLogin,
 )

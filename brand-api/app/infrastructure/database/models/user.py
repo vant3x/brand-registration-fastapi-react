@@ -1,7 +1,8 @@
+from uuid import uuid4
+
 from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-from uuid import uuid4
 
 from app.infrastructure.database.models.base import Base
 

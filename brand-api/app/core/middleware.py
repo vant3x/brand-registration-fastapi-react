@@ -1,5 +1,6 @@
 import time
 import uuid
+
 from fastapi import Request
 
 
@@ -15,11 +16,11 @@ async def logging_and_timing_middleware(request: Request, call_next):
     response.headers["X-Request-ID"] = request_id
 
     log_message = (
-        f'RequestID: {request_id} | '
-        f'Method: {request.method} | '
-        f'Path: {request.url.path} | '
-        f'StatusCode: {response.status_code} | '
-        f'RquestTimeLatency: {formatted_process_time}ms'
+        f"RequestID: {request_id} | "
+        f"Method: {request.method} | "
+        f"Path: {request.url.path} | "
+        f"StatusCode: {response.status_code} | "
+        f"RquestTimeLatency: {formatted_process_time}ms"
     )
     print(log_message)
 

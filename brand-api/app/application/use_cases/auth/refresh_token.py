@@ -13,7 +13,9 @@ class RefreshTokenUseCase:
         payload = jwt_service.decode_token(refresh_token)
 
         if payload.get("token_type") != "refresh":
-            raise InvalidCredentialsException(detail="Invalid token type for refreshing")
+            raise InvalidCredentialsException(
+                detail="Invalid token type for refreshing"
+            )
 
         user_id_str = payload.get("sub")
         if not user_id_str:
@@ -25,4 +27,6 @@ class RefreshTokenUseCase:
 
         token_subject = str(user.id)
         extra_claims = {"email": user.email.value}
-        return jwt_service.create_access_token(subject=token_subject, extra_data=extra_claims)
+        return jwt_service.create_access_token(
+            subject=token_subject, extra_data=extra_claims
+        )

@@ -13,6 +13,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
 
+
 class UserUpdate(BaseModel):
     full_name: Optional[str] = Field(None, min_length=2, max_length=100)
     is_active: Optional[bool] = None
@@ -50,4 +51,3 @@ class RefreshTokenRequest(BaseModel):
 class TokenRefreshResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-

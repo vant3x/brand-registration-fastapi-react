@@ -2,13 +2,16 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
 import jwt
+
 from app.core.config import get_settings
 from app.core.exceptions import InvalidCredentialsException
 
 settings = get_settings()
 
 
-def create_access_token(subject: str, extra_data: Optional[Dict[str, Any]] = None) -> str:
+def create_access_token(
+    subject: str, extra_data: Optional[Dict[str, Any]] = None
+) -> str:
     """Creates a new access token."""
     expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
     to_encode = {
@@ -35,7 +38,9 @@ def create_refresh_token(subject: str) -> str:
 def decode_token(token: str) -> Dict[str, Any]:
     """Decodes a token and returns its payload. Handles exceptions."""
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         return payload
     except jwt.ExpiredSignatureError:
         raise InvalidCredentialsException(detail="Token has expired")

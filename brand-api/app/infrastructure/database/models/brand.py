@@ -1,8 +1,9 @@
+from uuid import uuid4
+
+import sqlalchemy as sa
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-import sqlalchemy as sa
-from uuid import uuid4
 
 from app.infrastructure.database.models.base import Base
 from app.shared.enums.brand_status import BrandStatus
@@ -14,7 +15,15 @@ class BrandModel(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     marca = Column(String, unique=True, index=True, nullable=False)
     titular = Column(String, index=True, nullable=False)
-    status = sa.Column(sa.Enum(BrandStatus, name="brand_status_enum", values_callable=lambda x: [e.value for e in x]), index=True, nullable=False)
+    status = sa.Column(
+        sa.Enum(
+            BrandStatus,
+            name="brand_status_enum",
+            values_callable=lambda x: [e.value for e in x],
+        ),
+        index=True,
+        nullable=False,
+    )
     pais_registro = Column(String, nullable=True)
     imagen_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=func.now())
