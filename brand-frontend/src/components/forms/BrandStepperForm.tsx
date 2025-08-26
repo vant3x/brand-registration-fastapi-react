@@ -12,10 +12,12 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import axiosClient from '../../config/axios'; 
+import { uploadBrandImage } from '../../services/brandService';
+import UploadImageButton from '../../components/forms/UploadImageButton'; 
 import { useRouter } from 'next/navigation';
 import CircularProgress from '@mui/material/CircularProgress';
 import { AxiosError } from "axios";
-
+import NewBrandPreviewDetail from '../brands/NewBrandPreviewDetail';
 
 interface BrandFormData {
     marca: string;
@@ -40,9 +42,15 @@ export default function BrandStepperForm() {
     pais_registro: '',
     imagen_url: '',
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const handleImageChange = (file: File) => {
+    console.log("Imagen seleccionada:", file.name);
+    setImageFile(file);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>) => {
     const { name, value } = e.target;
@@ -58,8 +66,17 @@ export default function BrandStepperForm() {
     setSuccess(null);
 
     try {
-      await axiosClient.post('/brands/', formData);
-      setSuccess('Marca registrada exitosamente!');
+      const response = await axiosClient.post('/brands/', formData);
+      const newBrandId = response.data.id;
+
+      if (imageFile) {
+  
+        await uploadBrandImage(newBrandId, imageFile);
+        setSuccess('Marca e imagen subida exitosamente!');
+      } else {
+        console.log("No se seleccionó ninguna imagen para subir.");
+      }
+
       setFormData({
         marca: '',
         titular: '',
@@ -67,10 +84,11 @@ export default function BrandStepperForm() {
         pais_registro: '',
         imagen_url: '',
       }); 
+      console.log("Redirigiendo a /marcas...");
       router.push('/marcas'); 
     } catch (err) {
       const axiosError = err as AxiosError<{ detail: string }>;
-      console.error('Error registering brand:', err);
+      console.error('Error en el proceso de registro:', err);
       setError(axiosError.response?.data?.detail || 'Error al registrar la marca.');
     } finally {
       setLoading(false);
@@ -157,13 +175,9 @@ export default function BrandStepperForm() {
               value={formData.pais_registro}
               onChange={handleChange}
             />
-            <TextField
-              id="imagen_url"
-              name="imagen_url"
-              label="URL de la Imagen (Opcional)"
-              value={formData.imagen_url}
-              onChange={handleChange}
-            />
+          
+
+            <UploadImageButton onImageSelect={handleImageChange} />
           </Box>
         );
       case 2:
@@ -209,6 +223,7 @@ export default function BrandStepperForm() {
             <Typography sx={{ mt: 2, mb: 1 }}>
               Todos los pasos completados - ¡has terminado!
             </Typography>
+            <NewBrandPreviewDetail formData={formData} imageFile={imageFile} />
             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
               <Box sx={{ flex: '1 1 auto' }} />
               <Button onClick={handleReset}>Reiniciar</Button>

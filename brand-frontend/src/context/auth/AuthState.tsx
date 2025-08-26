@@ -34,7 +34,7 @@ interface LoginFormValues {
 }
 
 interface SignupFormValues {
-  // Assuming signup has at least email and password, add other fields as needed
+  name: string;
   email: string;
   password: string;
 }

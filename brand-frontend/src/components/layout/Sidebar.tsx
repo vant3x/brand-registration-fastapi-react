@@ -5,6 +5,7 @@ import Link from 'next/link';
 import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark'; 
 import AddBusinessIcon from '@mui/icons-material/AddBusiness'; 
 import Image from "next/image";
+
 import AuthContext from '../../context/auth/AuthContext';
 interface SidebarProps {
   drawerWidth: number;
@@ -21,11 +22,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   const drawer = (
     <div>
       <Toolbar>
-      
+      <Link href="/">
         <Image       src="/assets/image.webp"
         width={140}
         height={140}
         alt="Logo" />
+        </Link>
       </Toolbar>
       <Divider />
       <List>
