@@ -1,4 +1,3 @@
-
 'use client';
 import React from 'react';
 import Card from '@mui/material/Card';
@@ -31,7 +30,7 @@ const NewBrandPreviewDetail: React.FC<NewBrandPreviewDetailProps> = ({ formData,
           Previsualización de la Marca
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <CardMedia
                 component="img"
@@ -47,7 +46,7 @@ const NewBrandPreviewDetail: React.FC<NewBrandPreviewDetailProps> = ({ formData,
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 12}}>
             <Typography variant="subtitle1" color="text.secondary">
               <strong>Marca:</strong> {formData.marca || 'No especificado'}
             </Typography>
