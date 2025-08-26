@@ -62,7 +62,7 @@ async def get_brand_image_presigned_url(
     brand_id: UUID,
     brand_repo=Depends(get_brand_repository),
     s3_service=Depends(get_s3_service),
-    current_user: User = Depends(get_current_user),
+    #current_user: User = Depends(get_current_user),
 ):
     use_case = GetPresignedUrlUseCase(brand_repo, s3_service)
     presigned_url = await use_case.execute(brand_id)
