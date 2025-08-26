@@ -50,7 +50,6 @@ class S3Service:
             )
             return file_url
         except ClientError as e:
-            # Log the error for debugging
             logger.error(f"Error uploading file to S3: {e}")
             raise
 

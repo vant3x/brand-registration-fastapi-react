@@ -17,8 +17,6 @@ class GetPresignedUrlUseCase:
         if not existing_brand or not existing_brand.imagen_url:
             raise BrandNotFoundError("Brand or image not found.")
 
-        # Extract object_name from the stored imagen_url
-        # Assuming the URL format is https://<bucket_name>.s3.<region>.amazonaws.com/<object_name>
         object_name = "/".join(existing_brand.imagen_url.split("/")[3:])
 
         presigned_url = self.s3_service.create_presigned_url(object_name)

@@ -1,0 +1,6 @@
+
+aws cloudformation deploy \
+--template-file backend-awscft.yml \
+--stack-name signaip-brand-api-stack \
+--capabilities CAPABILITY_NAMED_IAM \
+--parameter-overrides \
