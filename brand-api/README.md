@@ -19,7 +19,7 @@ Asegúrate de tener instalados los siguientes programas:
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/vant3x/brand-registration-fastapi-react.git
 cd brand-api
 ```
 
