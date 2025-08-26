@@ -39,7 +39,6 @@ interface SignupFormValues {
   password: string;
 }
 
-// Define interface for Axios error response
 interface AxiosErrorResponse {
   response?: {
     data?: {
@@ -49,18 +48,17 @@ interface AxiosErrorResponse {
 }
 
 const AuthState = ({ children }: Props) => {
-  const initialState: ReducerAuthState = { // Use ReducerAuthState for initialState
+  const initialState: ReducerAuthState = { 
     token: null,
     auth: null,
     user: null,
     message: null,
-    errorSession: null, // Changed from {} to null for consistency with ReducerAuthState
+    errorSession: null, 
     signupStatus: null
   };
 
   const [state, dispatch] = useReducer(authReducer, initialState);
-  const appCtx = useContext<AppContextType | undefined>(AppContext); // Use AppContext
-
+  const appCtx = useContext<AppContextType | undefined>(AppContext); 
   if (!appCtx) {
     throw new Error("AuthState must be used within an AppProvider");
   }
@@ -71,7 +69,7 @@ const AuthState = ({ children }: Props) => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("refreshToken");
     }
-    Cookies.remove('token', { path: '/' }); // Remove cookie on logout
+    Cookies.remove('token', { path: '/' }); 
     authToken(null);
     dispatch({
       type: LOGOUT,
@@ -104,9 +102,9 @@ const AuthState = ({ children }: Props) => {
     }
   }, [logout]);
 
-  const signup = async (values: SignupFormValues) => { // Typed values
+  const signup = async (values: SignupFormValues) => { 
     try {
-      await axiosClient.post("/users/", values); // Removed unused 'response' variable
+      await axiosClient.post("/users/", values); 
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: {
@@ -114,14 +112,14 @@ const AuthState = ({ children }: Props) => {
           status: 201
         }
       });
-      showSnackbar("Usuario creado correctamente", "success"); // Show success snackbar
+      showSnackbar("Usuario creado correctamente", "success"); 
     } catch (error: unknown) {
       const axiosError = error as AxiosErrorResponse;
       dispatch({
         type: SIGNUP_ERROR,
-        payload: axiosError.response?.data?.detail || null, // Added || null
+        payload: axiosError.response?.data?.detail || null, 
       });
-      showSnackbar(axiosError.response?.data?.detail || "Error al crear usuario", "error"); // Show error snackbar, added optional chaining
+      showSnackbar(axiosError.response?.data?.detail || "Error al crear usuario", "error"); 
     }
     setTimeout(() => {
       dispatch({
@@ -130,7 +128,7 @@ const AuthState = ({ children }: Props) => {
     }, 4000);
   };
 
-  const login = async (values: LoginFormValues) => { // Typed values
+  const login = async (values: LoginFormValues) => { 
     try {
       const response = await axiosClient.post("/auth/token", values);
       const { access_token, refresh_token } = response.data;
@@ -145,19 +143,18 @@ const AuthState = ({ children }: Props) => {
       });
 
       console.log('Setting token cookie with access_token:', access_token);
-      Cookies.set('token', access_token, { path: '/', expires: 7 }); // Set cookie for middleware
+      Cookies.set('token', access_token, { path: '/', expires: 7 }); 
       await userAuthtenticate(access_token);
-      showSnackbar("Inicio de sesión exitoso", "success"); // Show success snackbar
+      showSnackbar("Inicio de sesión exitoso", "success"); 
 
     } catch (error: unknown) {
       const axiosError = error as AxiosErrorResponse;
       dispatch({
         type: LOGIN_ERROR,
-        payload: axiosError.response?.data?.detail || null, // Added || null
+        payload: axiosError.response?.data?.detail || null, 
       });
-      showSnackbar(axiosError.response?.data?.detail || "Credenciales incorrectas", "error"); // Show error snackbar
+      showSnackbar(axiosError.response?.data?.detail || "Credenciales incorrectas", "error"); 
     }
-    // Removed setTimeout for REMOVE_ALERTS as snackbar handles auto-hide
   };
 
   useEffect(() => {

@@ -1,6 +1,49 @@
 
 aws cloudformation deploy \
 --template-file backend-awscft.yml \
---stack-name signaip-brand-api-stack \
+--stack-name signaip-brand-api-stacks \
 --capabilities CAPABILITY_NAMED_IAM \
 --parameter-overrides \
+EnvironmentName=prod \
+ImageUri="656132068700.dkr.ecr.us-east-2.amazonaws.com/brand-api:latest" \
+DomainName="api.alevante.xyz" \
+CertificateArn="arn:aws:acm:us-east-2:656132068700:certificate/f02b7073-6b8a-408c-8bf8-dd8273ea8201" \
+S3BucketName="brands-images-signaip"
+
+ [656132068700.dkr.ecr.us-east-2.amazonaws.com/brand-api]
+
+
+ aws cloudformation deploy \
+--template-file backend-awscft.yml \
+--stack-name signaip-brand-api-stacks \
+--capabilities CAPABILITY_NAMED_IAM \
+--parameter-overrides \
+EnvironmentName=prod \
+ImageUri=656132068700.dkr.ecr.us-east-2.amazonaws.com/brand-api:latest \
+DomainName=api.alevante.xyz \
+CertificateArn=arn:aws:acm:us-east-2:656132068700:certificate/f02b7073-6b8a-408c-8bf8-dd8273ea8201\
+S3BucketName=brands-images-signaip
+
+
+
+
+
+---- final
+
+➜  infraestructure git:(master) ✗ aws cloudformation deploy \
+--template-file backend-awscft.yml \
+--stack-name signaip-brand-api-stack1 \
+--capabilities CAPABILITY_NAMED_IAM \
+--parameter-overrides \
+"EnvironmentName=prod" \
+"ImageUri=656132068700.dkr.ecr.us-east-2.amazonaws.com/brand-api:latest" \
+"DomainName=api.alevante.xyz" \
+"CertificateArn=arn:aws:acm:us-east-2:656132068700:certificate/f02b7073-6b8a-408c-8bf8-dd8273ea8201" \
+"S3BucketName=brands-images-signaip1"
+
+Waiting for changeset to be created..
+Waiting for stack create/update to complete
+
+Failed to create/update the stack. Run the following command
+to fetch the list of events leading up to the failure
+aws cloudformation describe-stack-events --stack-name signaip-brand-api-stack1
