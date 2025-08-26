@@ -15,7 +15,7 @@ export default function BrandsListPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getBrands(); // Use the service function
+      const data = await getBrands(); 
       setBrands(data);
     } catch (err) {
       console.error("Error fetching brands:", err);
